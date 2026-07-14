@@ -1,10 +1,11 @@
 package com.talep.base.ui;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
@@ -12,24 +13,29 @@ import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
-import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
+import com.vaadin.flow.spring.security.AuthenticationContext;
+import jakarta.annotation.security.PermitAll;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Layout
+@PermitAll
 public final class MainLayout extends AppLayout {
 
-    MainLayout() {
+    private final transient AuthenticationContext authContext;
+
+    public MainLayout(AuthenticationContext authContext) {
+        this.authContext = authContext;
         setPrimarySection(Section.DRAWER);
         addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
     }
 
     private Component createApplicationHeader() {
-        // TODO Replace with real application logo and name
-        var appLogo = new Avatar("My Application");
+        var appLogo = new Avatar("Talep Yönetimi");
         appLogo.addClassName("app-logo");
         appLogo.addThemeVariants(AvatarVariant.AURA_FILLED, AvatarVariant.XSMALL);
 
-        var appName = new Span("My Application");
+        var appName = new Span("Talep Yönetimi");
         appName.addClassName("app-name");
 
         var header = new HorizontalLayout(appLogo, appName);
@@ -45,7 +51,11 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createApplicationFooter() {
-        var footer = new VerticalLayout(new Span("Made with ❤️ with Vaadin"));
+        Button cikisButonu = new Button("Çıkış Yap", e -> authContext.logout());
+        cikisButonu.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
+        cikisButonu.setWidthFull();
+
+        var footer = new VerticalLayout(cikisButonu, new Span("Made with ❤️ with Vaadin"));
         footer.setAlignItems(FlexComponent.Alignment.CENTER);
         footer.addClassName("app-footer");
         return footer;
@@ -53,8 +63,23 @@ public final class MainLayout extends AppLayout {
 
     private SideNav createSideNav() {
         var nav = new SideNav();
-        nav.setMinWidth(200, Unit.PIXELS);
-        MenuConfiguration.getMenuEntries().forEach(entry -> nav.addItem(createSideNavItem(entry)));
+        
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            boolean isMusteri = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_MUSTERI"));
+            boolean isPo = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_PO"));
+
+            if (isMusteri) {
+                nav.addItem(new SideNavItem("Talep Oluştur", TalepView.class));
+            }
+            
+            if (isPo) {
+                nav.addItem(new SideNavItem("Gelen Talepler", GelenTaleplerView.class));
+            }
+        }
+        
         return nav;
     }
 
