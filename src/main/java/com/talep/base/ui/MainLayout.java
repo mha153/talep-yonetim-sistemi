@@ -66,17 +66,25 @@ public final class MainLayout extends AppLayout {
         
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            boolean isMusteri = auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_MUSTERI"));
-            boolean isPo = auth.getAuthorities().stream()
-                    .anyMatch(a -> a.getAuthority().equals("ROLE_PO"));
+            boolean isCustomer = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"));
+            boolean isProductOwner = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_PRODUCT_OWNER"));
+            boolean isDeveloper = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_DEVELOPER"));
 
-            if (isMusteri) {
+            if (isCustomer) {
                 nav.addItem(new SideNavItem("Talep Oluştur", TalepView.class));
             }
-            
-            if (isPo) {
+
+            if (isProductOwner) {
                 nav.addItem(new SideNavItem("Gelen Talepler", GelenTaleplerView.class));
+                nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
+            }
+
+            if (isDeveloper) {
+                nav.addItem(new SideNavItem("Sprint", SprintView.class));
+                nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
             }
         }
         

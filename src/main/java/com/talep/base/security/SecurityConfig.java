@@ -29,9 +29,9 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService users() {
         // Şifrelerin hepsi şimdilik 123
-        UserDetails musteri = User.withUsername("musteri").password("{noop}123").roles("MUSTERI").build();
-        UserDetails po = User.withUsername("po").password("{noop}123").roles("PO").build();
-        UserDetails yazilimci = User.withUsername("yazilimci").password("{noop}123").roles("YAZILIMCI").build();
+        UserDetails musteri = User.withUsername("musteri").password("{noop}123").roles("CUSTOMER").build();
+        UserDetails po = User.withUsername("po").password("{noop}123").roles("PRODUCT_OWNER").build();
+        UserDetails yazilimci = User.withUsername("yazilimci").password("{noop}123").roles("DEVELOPER").build();
         
         return new InMemoryUserDetailsManager(musteri, po, yazilimci);
     }
