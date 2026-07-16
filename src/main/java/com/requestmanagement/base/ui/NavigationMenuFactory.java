@@ -33,6 +33,7 @@ final class NavigationMenuFactory {
 
         if (isProductOwner) {
             nav.addItem(new SideNavItem("Gelen Talepler", PendingRequestsView.class));
+            nav.addItem(new SideNavItem("Sprint Takibi", SprintTrackingView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
         }
 

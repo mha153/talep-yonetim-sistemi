@@ -1,5 +1,7 @@
 package com.requestmanagement.base.ui;
 
+import com.requestmanagement.base.model.AppUser;
+import com.requestmanagement.base.repository.UserRepository;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -22,9 +24,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public final class MainLayout extends AppLayout {
 
     private final transient AuthenticationContext authContext;
+    private final transient UserRepository userRepository;
 
-    public MainLayout(AuthenticationContext authContext) {
+    public MainLayout(AuthenticationContext authContext, UserRepository userRepository) {
         this.authContext = authContext;
+        this.userRepository = userRepository;
         setPrimarySection(Section.DRAWER);
         addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
     }
@@ -51,13 +55,30 @@ public final class MainLayout extends AppLayout {
     }
 
     private Component createApplicationFooter() {
+        Span currentUserLabel = new Span(currentUserDisplayText());
+        currentUserLabel.getStyle().set("white-space", "normal").set("text-align", "center");
+
         Button logoutButton = new Button("Çıkış Yap", e -> authContext.logout());
         logoutButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
         logoutButton.setWidthFull();
 
-        var footer = new VerticalLayout(logoutButton, new Span("Made with ❤️ with Vaadin"));
+        var footer = new VerticalLayout(currentUserLabel, logoutButton);
         footer.setAlignItems(FlexComponent.Alignment.CENTER);
         footer.addClassName("app-footer");
         return footer;
+    }
+
+    private String currentUserDisplayText() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return "";
+        }
+        return CurrentUserResolver.find(userRepository, auth)
+                .map(this::formatUser)
+                .orElse("Giriş Yapan: " + auth.getName());
+    }
+
+    private String formatUser(AppUser user) {
+        return "Giriş Yapan: " + user.getNameSurname() + " (" + user.getRole().displayLabel() + ")";
     }
 }

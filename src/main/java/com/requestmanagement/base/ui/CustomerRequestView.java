@@ -17,8 +17,6 @@ import java.util.List;
 @RolesAllowed("CUSTOMER")
 public class CustomerRequestView extends VerticalLayout {
 
-    private static final String EMAIL_DOMAIN = "@requestmanagement.local";
-
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final RequestHistoryGrid historyGrid;
@@ -43,14 +41,7 @@ public class CustomerRequestView extends VerticalLayout {
     }
 
     private AppUser getCurrentCustomer() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        String email = username + EMAIL_DOMAIN;
-        return userRepository.findByEmail(email).orElseGet(() -> {
-            AppUser newUser = new AppUser();
-            newUser.setEmail(email);
-            newUser.setNameSurname(username);
-            newUser.setRole(Role.CUSTOMER);
-            return userRepository.save(newUser);
-        });
+        return CurrentUserResolver.findOrCreate(
+                userRepository, SecurityContextHolder.getContext().getAuthentication(), Role.CUSTOMER);
     }
 }
