@@ -66,7 +66,7 @@ class PendingRequestsGrid extends Grid<Request> {
         addColumn(request -> request.getStatus().displayLabel()).setHeader("Durum").setWidth("160px").setFlexGrow(0);
         addComponentColumn(request -> RequestActionButtons.create(
                 request, requestRepository, prioritizationRepository, workflowRepository, this::refresh))
-                .setHeader("İşlemler").setAutoWidth(true).setFlexGrow(0);
+                .setHeader("İşlemler").setWidth("80px").setFlexGrow(0);
     }
 
     private void configureDetails() {

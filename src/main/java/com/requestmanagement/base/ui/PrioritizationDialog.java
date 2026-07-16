@@ -8,7 +8,6 @@ import com.requestmanagement.base.repository.RequestRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -54,7 +53,7 @@ public class PrioritizationDialog extends Dialog {
                        RequestRepository requestRepository, Prioritization existing,
                        @Nullable Integer impact, @Nullable Integer urgency, Runnable onSaved) {
         if (impact == null || urgency == null) {
-            Notification.show("Lütfen İş Etkisi ve Aciliyet seçimlerini tamamlayın.");
+            Toast.show("Lütfen İş Etkisi ve Aciliyet seçimlerini tamamlayın.");
             return;
         }
 
@@ -68,7 +67,7 @@ public class PrioritizationDialog extends Dialog {
         request.setStatus(RequestStatus.PRIORITIZED);
         requestRepository.save(request);
 
-        Notification.show("Talep önceliklendirildi ve skor hesaplandı.");
+        Toast.show("Talep önceliklendirildi ve skor hesaplandı.");
         onSaved.run();
         close();
     }

@@ -8,7 +8,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -31,7 +30,7 @@ class RequestFormPanel extends VerticalLayout {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.addClickListener(e -> {
             if (titleField.isEmpty() || descriptionField.isEmpty()) {
-                Notification.show("Lütfen Talep Başlığı ve Açıklama alanlarını doldurun.");
+                Toast.show("Lütfen Talep Başlığı ve Açıklama alanlarını doldurun.");
                 return;
             }
 
@@ -42,7 +41,7 @@ class RequestFormPanel extends VerticalLayout {
             newRequest.setStatus(RequestStatus.NEW);
             requestRepository.save(newRequest);
 
-            Notification.show("Talep başarıyla gönderildi!");
+            Toast.show("Talep başarıyla gönderildi!");
             titleField.clear();
             descriptionField.clear();
             onSaved.run();

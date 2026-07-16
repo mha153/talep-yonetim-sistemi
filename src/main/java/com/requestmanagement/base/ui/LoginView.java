@@ -22,6 +22,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
         login.setAction("login");
         login.setI18n(buildTurkishI18n());
+        login.setForgotPasswordButtonVisible(false);
 
         add(new H1("Talep Yönetim Sistemi"), login);
     }

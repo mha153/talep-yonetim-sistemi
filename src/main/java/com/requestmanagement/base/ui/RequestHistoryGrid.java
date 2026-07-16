@@ -9,7 +9,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.List;
@@ -46,7 +45,7 @@ class RequestHistoryGrid extends VerticalLayout {
             request.setStatus(RequestStatus.REJECTED);
             requestRepository.save(request);
             refresh();
-            Notification.show("Talep iptal edildi.");
+            Toast.show("Talep iptal edildi.");
         });
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         return cancelButton;
