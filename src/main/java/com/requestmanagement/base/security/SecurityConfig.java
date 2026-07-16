@@ -29,10 +29,15 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService users() {
         // All passwords are 123 for now
-        UserDetails customerUser = User.withUsername("customer").password("{noop}123").roles("CUSTOMER").build();
+        UserDetails customer1 = User.withUsername("customer1").password("{noop}123").roles("CUSTOMER").build();
+        UserDetails customer2 = User.withUsername("customer2").password("{noop}123").roles("CUSTOMER").build();
+        UserDetails customer3 = User.withUsername("customer3").password("{noop}123").roles("CUSTOMER").build();
         UserDetails productOwnerUser = User.withUsername("po").password("{noop}123").roles("PRODUCT_OWNER").build();
-        UserDetails developerUser = User.withUsername("developer").password("{noop}123").roles("DEVELOPER").build();
+        UserDetails developer1 = User.withUsername("developer1").password("{noop}123").roles("DEVELOPER").build();
+        UserDetails developer2 = User.withUsername("developer2").password("{noop}123").roles("DEVELOPER").build();
+        UserDetails developer3 = User.withUsername("developer3").password("{noop}123").roles("DEVELOPER").build();
 
-        return new InMemoryUserDetailsManager(customerUser, productOwnerUser, developerUser);
+        return new InMemoryUserDetailsManager(
+                customer1, customer2, customer3, productOwnerUser, developer1, developer2, developer3);
     }
 }
