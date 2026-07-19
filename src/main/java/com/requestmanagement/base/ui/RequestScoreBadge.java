@@ -3,10 +3,14 @@ package com.requestmanagement.base.ui;
 import com.requestmanagement.base.model.Prioritization;
 import com.vaadin.flow.component.html.Span;
 
-/** Shared score→theme/label mapping used by the pending-requests grid and prioritization dialog. */
+/** Shared score formula/theme/label mapping used by the pending-requests grid and prioritization dialog. */
 final class RequestScoreBadge {
 
     private RequestScoreBadge() {
+    }
+
+    static int compute(int impact, int urgency) {
+        return impact * urgency * 4;
     }
 
     static Span create(Prioritization prioritization) {
@@ -23,22 +27,32 @@ final class RequestScoreBadge {
     }
 
     static String theme(int score) {
-        if (score >= 20) {
+        if (score >= 80) {
             return "error";
         }
-        if (score >= 10) {
+        if (score >= 40) {
             return "warning";
         }
         return "success";
     }
 
     static String label(int score) {
-        if (score >= 20) {
+        if (score >= 80) {
             return "KRİTİK ÖNCELİKLİ";
         }
-        if (score >= 10) {
+        if (score >= 40) {
             return "ORTA ÖNCELİKLİ";
         }
         return "DÜŞÜK ÖNCELİKLİ";
+    }
+
+    static String color(int score) {
+        if (score >= 80) {
+            return "#c62828";
+        }
+        if (score >= 40) {
+            return "#e65100";
+        }
+        return "#2e7d32";
     }
 }

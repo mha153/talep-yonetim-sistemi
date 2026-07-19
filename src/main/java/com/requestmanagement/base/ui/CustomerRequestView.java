@@ -3,8 +3,12 @@ package com.requestmanagement.base.ui;
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.model.Request;
 import com.requestmanagement.base.model.Role;
+import com.requestmanagement.base.repository.NotificationRepository;
+import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
+import com.requestmanagement.base.repository.WorkflowRepository;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -21,13 +25,19 @@ public class CustomerRequestView extends VerticalLayout {
     private final UserRepository userRepository;
     private final RequestHistoryGrid historyGrid;
 
-    public CustomerRequestView(RequestRepository requestRepository, UserRepository userRepository) {
+    public CustomerRequestView(RequestRepository requestRepository, UserRepository userRepository,
+                                NotificationRepository notificationRepository,
+                                RequestActivityRepository activityRepository,
+                                RequestMessageRepository messageRepository, WorkflowRepository workflowRepository) {
         this.requestRepository = requestRepository;
         this.userRepository = userRepository;
         setWidthFull();
 
-        RequestFormPanel formPanel = new RequestFormPanel(requestRepository, this::getCurrentCustomer, this::refreshHistory);
-        historyGrid = new RequestHistoryGrid(requestRepository, this::currentCustomerRequests);
+        RequestFormPanel formPanel = new RequestFormPanel(requestRepository, userRepository, notificationRepository,
+                activityRepository, this::getCurrentCustomer, this::refreshHistory);
+        historyGrid = new RequestHistoryGrid(requestRepository, activityRepository, messageRepository,
+                notificationRepository, userRepository, workflowRepository, this::currentCustomerRequests,
+                this::getCurrentCustomer);
 
         add(formPanel, new Hr(), historyGrid);
     }

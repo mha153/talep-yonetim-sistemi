@@ -1,6 +1,7 @@
 package com.requestmanagement.base.ui;
 
 import com.requestmanagement.base.repository.PrioritizationRepository;
+import com.requestmanagement.base.repository.RequestActivityRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -12,8 +13,9 @@ import jakarta.annotation.security.RolesAllowed;
 public class CompletedView extends VerticalLayout {
 
     public CompletedView(RequestRepository requestRepository, PrioritizationRepository prioritizationRepository,
-                          WorkflowRepository workflowRepository) {
+                          WorkflowRepository workflowRepository, RequestActivityRepository activityRepository) {
         setSizeFull();
-        add(new ArchivedRequestsGrid(requestRepository, prioritizationRepository, workflowRepository));
+        add(new ArchivedRequestsGrid(requestRepository, prioritizationRepository, workflowRepository,
+                activityRepository));
     }
 }

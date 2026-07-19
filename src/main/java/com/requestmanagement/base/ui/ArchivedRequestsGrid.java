@@ -5,6 +5,7 @@ import com.requestmanagement.base.model.RequestStatus;
 import com.requestmanagement.base.model.Workflow;
 import com.requestmanagement.base.model.WorkflowStatus;
 import com.requestmanagement.base.repository.PrioritizationRepository;
+import com.requestmanagement.base.repository.RequestActivityRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.vaadin.flow.component.grid.Grid;
@@ -18,19 +19,22 @@ class ArchivedRequestsGrid extends Grid<Request> {
     private final WorkflowRepository workflowRepository;
 
     ArchivedRequestsGrid(RequestRepository requestRepository, PrioritizationRepository prioritizationRepository,
-                          WorkflowRepository workflowRepository) {
+                          WorkflowRepository workflowRepository, RequestActivityRepository activityRepository) {
         super(Request.class, false);
         this.workflowRepository = workflowRepository;
 
         setSizeFull();
         addColumn(Request::getRequestId).setHeader("ID").setWidth("60px").setFlexGrow(0);
         addColumn(request -> request.getCustomer().getNameSurname()).setHeader("Müşteri").setFlexGrow(1);
-        addColumn(Request::getTitle).setHeader("Başlık").setFlexGrow(1);
-        addColumn(Request::getDescription).setHeader("Açıklama").setFlexGrow(2);
+        addColumn(Request::getTitle).setHeader("Başlık").setFlexGrow(2);
         addColumn(new ComponentRenderer<>(request ->
                 RequestScoreBadge.create(prioritizationRepository.findByRequest(request).orElse(null))))
                 .setHeader("Skor").setWidth("130px").setFlexGrow(0);
         addColumn(this::outcomeLabel).setHeader("Sonuç").setWidth("160px").setFlexGrow(0);
+
+        setItemDetailsRenderer(new ComponentRenderer<>(
+                request -> new RequestDetailsPanel(request, activityRepository)));
+        setDetailsVisibleOnClick(true);
 
         setItems(loadArchivedRequests(requestRepository, workflowRepository));
     }

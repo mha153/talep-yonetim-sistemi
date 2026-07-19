@@ -38,7 +38,8 @@ final class NavigationMenuFactory {
         }
 
         if (isDeveloper) {
-            nav.addItem(new SideNavItem("Sprint", SprintView.class));
+            nav.addItem(new SideNavItem("Sprint Havuzu", SprintView.class));
+            nav.addItem(new SideNavItem("Görevlerim", MyTasksView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
         }
 

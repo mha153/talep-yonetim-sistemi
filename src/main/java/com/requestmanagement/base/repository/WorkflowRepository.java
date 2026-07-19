@@ -1,5 +1,6 @@
 package com.requestmanagement.base.repository;
 
+import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.model.Request;
 import com.requestmanagement.base.model.Workflow;
 import com.requestmanagement.base.model.WorkflowStatus;
@@ -14,6 +15,10 @@ public interface WorkflowRepository extends JpaRepository<Workflow, Long> {
     List<Workflow> findByWorkflowStatusNot(WorkflowStatus workflowStatus);
 
     List<Workflow> findByWorkflowStatus(WorkflowStatus workflowStatus);
+
+    List<Workflow> findByDeveloperIsNullAndWorkflowStatusNot(WorkflowStatus workflowStatus);
+
+    List<Workflow> findByDeveloperAndWorkflowStatusNot(AppUser developer, WorkflowStatus workflowStatus);
 
     boolean existsByRequest(Request request);
 

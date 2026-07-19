@@ -1,17 +1,28 @@
 package com.requestmanagement.base.ui;
 
+import com.requestmanagement.base.model.AppUser;
+import com.requestmanagement.base.model.MessageChannel;
 import com.requestmanagement.base.model.Workflow;
 import com.requestmanagement.base.model.WorkflowStatus;
+import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
+import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestMessageRepository;
+import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 /** PO-facing, read-only view of workflow items that are not yet done. */
 class SprintTrackingGrid extends Grid<Workflow> {
 
-    SprintTrackingGrid(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository) {
+    SprintTrackingGrid(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository,
+                        RequestActivityRepository activityRepository, RequestMessageRepository messageRepository,
+                        NotificationRepository notificationRepository, UserRepository userRepository,
+                        AppUser currentPo) {
         super(Workflow.class, false);
         setSizeFull();
 
@@ -25,14 +36,35 @@ class SprintTrackingGrid extends Grid<Workflow> {
                 .setHeader("Durum").setWidth("140px").setFlexGrow(0);
         addColumn(workflow -> workflow.getDeveloper() == null ? "Atanmadı" : workflow.getDeveloper().getNameSurname())
                 .setHeader("Üstlenen").setWidth("140px").setFlexGrow(0);
+        addComponentColumn(workflow -> buildCommunicationButtons(workflow, messageRepository,
+                notificationRepository, userRepository, currentPo))
+                .setHeader("İletişim").setWidth("140px").setFlexGrow(0);
 
-        setItemDetailsRenderer(new ComponentRenderer<>(workflow -> {
-            Span description = new Span("Açıklama: " + workflow.getRequest().getDescription());
-            description.getStyle().set("white-space", "pre-wrap");
-            return description;
-        }));
+        setItemDetailsRenderer(new ComponentRenderer<>(
+                workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository)));
         setDetailsVisibleOnClick(true);
 
         setItems(workflowRepository.findByWorkflowStatusNot(WorkflowStatus.DONE));
+    }
+
+    private HorizontalLayout buildCommunicationButtons(Workflow workflow, RequestMessageRepository messageRepository,
+                                                         NotificationRepository notificationRepository,
+                                                         UserRepository userRepository, AppUser currentPo) {
+        Button messageButton = new Button("Mesaj", e -> new RequestConversationDialog(workflow.getRequest(),
+                MessageChannel.CUSTOMER_PO, "Müşteri Görüşmesi", messageRepository, notificationRepository,
+                userRepository, currentPo, () -> getDataProvider().refreshItem(workflow)).open());
+        messageButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        boolean messageUnread = messageRepository.existsByRequestAndChannelAndReadFalseAndAuthorNot(
+                workflow.getRequest(), MessageChannel.CUSTOMER_PO, currentPo);
+
+        Button noteButton = new Button("Not", e -> new RequestConversationDialog(workflow.getRequest(),
+                MessageChannel.INTERNAL, "Developer Notu", messageRepository, notificationRepository,
+                userRepository, currentPo, () -> getDataProvider().refreshItem(workflow)).open());
+        noteButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+        boolean noteUnread = messageRepository.existsByRequestAndChannelAndReadFalseAndAuthorNot(
+                workflow.getRequest(), MessageChannel.INTERNAL, currentPo);
+
+        return new HorizontalLayout(MessageIndicatorIcon.wrap(messageButton, messageUnread),
+                MessageIndicatorIcon.wrap(noteButton, noteUnread));
     }
 }

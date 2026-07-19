@@ -3,7 +3,10 @@ package com.requestmanagement.base.ui;
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.model.Request;
 import com.requestmanagement.base.model.RequestStatus;
+import com.requestmanagement.base.repository.NotificationRepository;
+import com.requestmanagement.base.repository.RequestActivityRepository;
 import com.requestmanagement.base.repository.RequestRepository;
+import com.requestmanagement.base.repository.UserRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -17,7 +20,9 @@ import java.util.function.Supplier;
 /** The customer-facing "create a new request" form. */
 class RequestFormPanel extends VerticalLayout {
 
-    RequestFormPanel(RequestRepository requestRepository, Supplier<AppUser> currentCustomer, Runnable onSaved) {
+    RequestFormPanel(RequestRepository requestRepository, UserRepository userRepository,
+                      NotificationRepository notificationRepository, RequestActivityRepository activityRepository,
+                      Supplier<AppUser> currentCustomer, Runnable onSaved) {
         TextField titleField = new TextField("Talep Başlığı");
         TextArea descriptionField = new TextArea("Açıklama");
         descriptionField.setMinHeight("120px");
@@ -39,7 +44,11 @@ class RequestFormPanel extends VerticalLayout {
             newRequest.setTitle(titleField.getValue());
             newRequest.setDescription(descriptionField.getValue());
             newRequest.setStatus(RequestStatus.NEW);
-            requestRepository.save(newRequest);
+            newRequest = requestRepository.save(newRequest);
+
+            ActivityRecorder.record(activityRepository, newRequest, "Talep oluşturuldu");
+            NotificationCenter.notifyProductOwner(notificationRepository, userRepository, newRequest,
+                    newRequest.getCustomer(), "yeni bir talep oluşturdu: " + newRequest.getTitle());
 
             Toast.show("Talep başarıyla gönderildi!");
             titleField.clear();

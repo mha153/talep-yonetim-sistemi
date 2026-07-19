@@ -1,12 +1,16 @@
 package com.requestmanagement.base.ui;
 
+import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.model.Request;
 import com.requestmanagement.base.model.RequestStatus;
+import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
+import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.RequestRepository;
+import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
 import java.util.Comparator;
@@ -20,17 +24,21 @@ class PendingRequestsGrid extends Grid<Request> {
     private final RequestRepository requestRepository;
     private final PrioritizationRepository prioritizationRepository;
     private final WorkflowRepository workflowRepository;
+    private final RequestActivityRepository activityRepository;
     private String searchText = "";
 
     PendingRequestsGrid(RequestRepository requestRepository, PrioritizationRepository prioritizationRepository,
-                         WorkflowRepository workflowRepository) {
+                         WorkflowRepository workflowRepository, UserRepository userRepository,
+                         NotificationRepository notificationRepository, RequestActivityRepository activityRepository,
+                         RequestMessageRepository messageRepository, AppUser currentPo) {
         super(Request.class, false);
         this.requestRepository = requestRepository;
         this.prioritizationRepository = prioritizationRepository;
         this.workflowRepository = workflowRepository;
+        this.activityRepository = activityRepository;
 
         setSizeFull();
-        configureColumns();
+        configureColumns(userRepository, notificationRepository, messageRepository, currentPo);
         configureDetails();
         refresh();
     }
@@ -56,7 +64,8 @@ class PendingRequestsGrid extends Grid<Request> {
         setItems(requests);
     }
 
-    private void configureColumns() {
+    private void configureColumns(UserRepository userRepository, NotificationRepository notificationRepository,
+                                   RequestMessageRepository messageRepository, AppUser currentPo) {
         addColumn(Request::getRequestId).setHeader("ID").setWidth("60px").setFlexGrow(0);
         addColumn(request -> request.getCustomer().getNameSurname()).setHeader("Müşteri").setFlexGrow(1);
         addColumn(Request::getTitle).setHeader("Talep Başlığı").setFlexGrow(2);
@@ -64,17 +73,15 @@ class PendingRequestsGrid extends Grid<Request> {
                 RequestScoreBadge.create(prioritizationRepository.findByRequest(request).orElse(null))))
                 .setHeader("Skor").setWidth("130px").setFlexGrow(0);
         addColumn(request -> request.getStatus().displayLabel()).setHeader("Durum").setWidth("160px").setFlexGrow(0);
-        addComponentColumn(request -> RequestActionButtons.create(
-                request, requestRepository, prioritizationRepository, workflowRepository, this::refresh))
+        addComponentColumn(request -> RequestActionButtons.create(request, requestRepository,
+                prioritizationRepository, workflowRepository, userRepository, notificationRepository,
+                activityRepository, messageRepository, currentPo, this::refresh))
                 .setHeader("İşlemler").setWidth("80px").setFlexGrow(0);
     }
 
     private void configureDetails() {
-        setItemDetailsRenderer(new ComponentRenderer<>(request -> {
-            Span description = new Span("Açıklama: " + request.getDescription());
-            description.getStyle().set("white-space", "pre-wrap");
-            return description;
-        }));
+        setItemDetailsRenderer(new ComponentRenderer<>(
+                request -> new RequestDetailsPanel(request, activityRepository)));
         setDetailsVisibleOnClick(true);
     }
 

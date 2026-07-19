@@ -1,6 +1,7 @@
 package com.requestmanagement.base.ui;
 
 import com.requestmanagement.base.model.AppUser;
+import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -19,16 +20,21 @@ import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 @Layout
 @PermitAll
 public final class MainLayout extends AppLayout {
 
     private final transient AuthenticationContext authContext;
     private final transient UserRepository userRepository;
+    private final transient NotificationRepository notificationRepository;
 
-    public MainLayout(AuthenticationContext authContext, UserRepository userRepository) {
+    public MainLayout(AuthenticationContext authContext, UserRepository userRepository,
+                       NotificationRepository notificationRepository) {
         this.authContext = authContext;
         this.userRepository = userRepository;
+        this.notificationRepository = notificationRepository;
         setPrimarySection(Section.DRAWER);
         addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
     }
@@ -41,7 +47,8 @@ public final class MainLayout extends AppLayout {
         var appName = new Span("Talep Yönetimi");
         appName.addClassName("app-name");
 
-        var header = new HorizontalLayout(appLogo, appName);
+        var header = new HorizontalLayout(appLogo, appName, new ThemeToggle());
+        currentUser().ifPresent(user -> header.add(new NotificationBell(notificationRepository, user)));
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setPadding(true);
         return header;
@@ -68,14 +75,13 @@ public final class MainLayout extends AppLayout {
         return footer;
     }
 
-    private String currentUserDisplayText() {
+    private Optional<AppUser> currentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null) {
-            return "";
-        }
-        return CurrentUserResolver.find(userRepository, auth)
-                .map(this::formatUser)
-                .orElse("Giriş Yapan: " + auth.getName());
+        return auth == null ? Optional.empty() : CurrentUserResolver.find(userRepository, auth);
+    }
+
+    private String currentUserDisplayText() {
+        return currentUser().map(this::formatUser).orElse("");
     }
 
     private String formatUser(AppUser user) {

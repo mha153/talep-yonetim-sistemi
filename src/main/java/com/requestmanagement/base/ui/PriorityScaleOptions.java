@@ -13,17 +13,17 @@ final class PriorityScaleOptions {
     static final Map<Integer, String> URGENCY = new LinkedHashMap<>();
 
     static {
-        IMPACT.put(1, "1 - Çok Düşük: Kozmetik/görsel, iş süreçlerini etkilemiyor");
-        IMPACT.put(2, "2 - Düşük: Küçük rahatsızlık, nadiren kullanılan bir alanı etkiliyor");
-        IMPACT.put(3, "3 - Orta: Alternatif çözümü (workaround) bulunan iş süreçleri");
-        IMPACT.put(4, "4 - Yüksek: Ana iş sürecini yavaşlatan, workaround'u zor bir sorun");
-        IMPACT.put(5, "5 - Kritik: Sistemin veya ana iş sürecinin tamamen durmasına yol açıyor");
+        IMPACT.put(1, "1 - Çok Düşük");
+        IMPACT.put(2, "2 - Düşük");
+        IMPACT.put(3, "3 - Orta");
+        IMPACT.put(4, "4 - Yüksek");
+        IMPACT.put(5, "5 - Kritik");
 
-        URGENCY.put(1, "1 - Çok Düşük: Zaman baskısı yok, ileride ele alınabilir");
-        URGENCY.put(2, "2 - Düşük (Uzun Vadeli): Önümüzdeki birkaç sprint içinde planlanabilir");
-        URGENCY.put(3, "3 - Orta (Orta Vadeli): Yakın gelecekte ele alınmalı");
-        URGENCY.put(4, "4 - Kısa Vadeli (Yüksek): Mevcut aktif Sprint içinde tamamlanmalı");
-        URGENCY.put(5, "5 - Kritik: Derhal müdahale gerektiriyor, üretim ortamını etkiliyor");
+        URGENCY.put(1, "1 - Çok Uzun Vadeli");
+        URGENCY.put(2, "2 - Uzun Vadeli");
+        URGENCY.put(3, "3 - Orta Vadeli");
+        URGENCY.put(4, "4 - Kısa Vadeli");
+        URGENCY.put(5, "5 - Kritik");
     }
 
     private PriorityScaleOptions() {
