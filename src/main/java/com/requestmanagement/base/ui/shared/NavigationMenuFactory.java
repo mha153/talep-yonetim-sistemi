@@ -4,6 +4,7 @@ import com.requestmanagement.base.ui.archive.CompletedView;
 import com.requestmanagement.base.ui.customer.CustomerRequestView;
 import com.requestmanagement.base.ui.developer.MyTasksView;
 import com.requestmanagement.base.ui.developer.SprintView;
+import com.requestmanagement.base.ui.po.DashboardView;
 import com.requestmanagement.base.ui.po.PendingRequestsView;
 import com.requestmanagement.base.ui.po.SprintTrackingView;
 import com.vaadin.flow.component.Component;
@@ -38,6 +39,7 @@ final class NavigationMenuFactory {
         }
 
         if (isProductOwner) {
+            nav.addItem(new SideNavItem("Dashboard", DashboardView.class));
             nav.addItem(new SideNavItem("Gelen Talepler", PendingRequestsView.class));
             nav.addItem(new SideNavItem("Sprint Takibi", SprintTrackingView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
