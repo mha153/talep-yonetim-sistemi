@@ -51,6 +51,8 @@ final class NavigationMenuFactory {
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
         }
 
+        nav.addItem(new SideNavItem("Profil Ayarları", ProfileView.class));
+
         return nav;
     }
 

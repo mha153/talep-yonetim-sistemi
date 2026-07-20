@@ -5,6 +5,7 @@ import com.requestmanagement.base.model.Role;
 import com.requestmanagement.base.repository.UserRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class DemoUserSeeder implements ApplicationRunner {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DemoUserSeeder(UserRepository userRepository) {
+    public DemoUserSeeder(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -38,6 +41,7 @@ public class DemoUserSeeder implements ApplicationRunner {
         user.setEmail(email);
         user.setNameSurname(nameSurname);
         user.setRole(role);
+        user.setPassword(passwordEncoder.encode("123"));
         userRepository.save(user);
     }
 }
