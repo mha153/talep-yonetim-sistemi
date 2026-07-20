@@ -1,6 +1,6 @@
 package com.requestmanagement.base.security;
 
-import com.requestmanagement.base.ui.LoginView;
+import com.requestmanagement.base.ui.login.LoginView;
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
