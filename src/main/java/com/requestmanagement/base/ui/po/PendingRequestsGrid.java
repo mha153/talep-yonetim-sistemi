@@ -6,6 +6,7 @@ import com.requestmanagement.base.model.RequestStatus;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
@@ -27,17 +28,20 @@ class PendingRequestsGrid extends Grid<Request> {
     private final transient PrioritizationRepository prioritizationRepository;
     private final transient WorkflowRepository workflowRepository;
     private final transient RequestActivityRepository activityRepository;
+    private final transient RequestAttachmentRepository attachmentRepository;
     private String searchText = "";
 
     PendingRequestsGrid(RequestRepository requestRepository, PrioritizationRepository prioritizationRepository,
                          WorkflowRepository workflowRepository, UserRepository userRepository,
                          NotificationRepository notificationRepository, RequestActivityRepository activityRepository,
-                         RequestMessageRepository messageRepository, AppUser currentPo) {
+                         RequestAttachmentRepository attachmentRepository, RequestMessageRepository messageRepository,
+                         AppUser currentPo) {
         super(Request.class, false);
         this.requestRepository = requestRepository;
         this.prioritizationRepository = prioritizationRepository;
         this.workflowRepository = workflowRepository;
         this.activityRepository = activityRepository;
+        this.attachmentRepository = attachmentRepository;
 
         setSizeFull();
         configureColumns(userRepository, notificationRepository, messageRepository, currentPo);
@@ -83,7 +87,7 @@ class PendingRequestsGrid extends Grid<Request> {
 
     private void configureDetails() {
         setItemDetailsRenderer(new ComponentRenderer<>(
-                request -> new RequestDetailsPanel(request, activityRepository)));
+                request -> new RequestDetailsPanel(request, activityRepository, attachmentRepository)));
         setDetailsVisibleOnClick(true);
     }
 

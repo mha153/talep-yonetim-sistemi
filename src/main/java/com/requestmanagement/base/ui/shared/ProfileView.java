@@ -2,6 +2,7 @@ package com.requestmanagement.base.ui.shared;
 
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.repository.UserRepository;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
@@ -33,7 +34,7 @@ public class ProfileView extends VerticalLayout {
         Button saveNameButton = new Button("Adı Kaydet", e -> {
             currentUser.setNameSurname(nameField.getValue());
             userRepository.save(currentUser);
-            Toast.show("Ad soyad güncellendi.");
+            UI.getCurrent().getPage().reload();
         });
         saveNameButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
 

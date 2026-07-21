@@ -5,6 +5,7 @@ import com.requestmanagement.base.model.Role;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
@@ -24,11 +25,13 @@ public class MyTasksView extends VerticalLayout {
 
     public MyTasksView(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository,
                         UserRepository userRepository, NotificationRepository notificationRepository,
-                        RequestActivityRepository activityRepository, RequestMessageRepository messageRepository) {
+                        RequestActivityRepository activityRepository,
+                        RequestAttachmentRepository attachmentRepository,
+                        RequestMessageRepository messageRepository) {
         AppUser currentDeveloper = CurrentUserResolver.findOrCreate(
                 userRepository, SecurityContextHolder.getContext().getAuthentication(), Role.DEVELOPER);
         setSizeFull();
-        add(new MyTasksGrid(workflowRepository, prioritizationRepository, activityRepository, messageRepository,
-                notificationRepository, userRepository, currentDeveloper));
+        add(new MyTasksGrid(workflowRepository, prioritizationRepository, activityRepository, attachmentRepository,
+                messageRepository, notificationRepository, userRepository, currentDeveloper));
     }
 }

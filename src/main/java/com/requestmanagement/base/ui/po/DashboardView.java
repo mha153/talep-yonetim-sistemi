@@ -18,7 +18,7 @@ import java.util.List;
 
 /** PO-facing overview: every request's lifecycle stage shown as a single pie chart. */
 @Route(value = "dashboard", layout = MainLayout.class)
-@PageTitle("Dashboard")
+@PageTitle("Genel Bakış")
 @RolesAllowed("PRODUCT_OWNER")
 public class DashboardView extends VerticalLayout {
 

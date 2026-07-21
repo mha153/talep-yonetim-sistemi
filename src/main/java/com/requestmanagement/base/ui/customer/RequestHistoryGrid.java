@@ -6,6 +6,7 @@ import com.requestmanagement.base.model.Request;
 import com.requestmanagement.base.model.RequestStatus;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
@@ -40,9 +41,9 @@ class RequestHistoryGrid extends VerticalLayout {
     private final Grid<Request> grid = new Grid<>(Request.class, false);
 
     RequestHistoryGrid(RequestRepository requestRepository, RequestActivityRepository activityRepository,
-                        RequestMessageRepository messageRepository, NotificationRepository notificationRepository,
-                        UserRepository userRepository, WorkflowRepository workflowRepository,
-                        Supplier<List<Request>> requestsSupplier, Supplier<AppUser> currentUser) {
+                        RequestAttachmentRepository attachmentRepository, RequestMessageRepository messageRepository,
+                        NotificationRepository notificationRepository, UserRepository userRepository,
+                        WorkflowRepository workflowRepository, Supplier<List<Request>> requestsSupplier, Supplier<AppUser> currentUser) {
         this.requestRepository = requestRepository;
         this.activityRepository = activityRepository;
         this.messageRepository = messageRepository;
@@ -55,9 +56,8 @@ class RequestHistoryGrid extends VerticalLayout {
         grid.addColumn(Request::getTitle).setHeader("Talep Başlığı").setFlexGrow(1);
         grid.addColumn(this::statusLabel).setHeader("Son Durum").setWidth("180px").setFlexGrow(0);
         grid.addComponentColumn(this::buildActions).setHeader("İşlem").setWidth("200px").setFlexGrow(0);
-
         grid.setItemDetailsRenderer(new ComponentRenderer<>(
-                request -> new RequestDetailsPanel(request, activityRepository)));
+                request -> new RequestDetailsPanel(request, activityRepository, attachmentRepository)));
         grid.setDetailsVisibleOnClick(true);
 
         setWidthFull();

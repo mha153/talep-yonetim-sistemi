@@ -6,6 +6,7 @@ import com.requestmanagement.base.model.Workflow;
 import com.requestmanagement.base.model.WorkflowStatus;
 import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
@@ -21,7 +22,8 @@ class ArchivedRequestsGrid extends Grid<Request> {
     private final transient WorkflowRepository workflowRepository;
 
     ArchivedRequestsGrid(RequestRepository requestRepository, PrioritizationRepository prioritizationRepository,
-                          WorkflowRepository workflowRepository, RequestActivityRepository activityRepository) {
+                          WorkflowRepository workflowRepository, RequestActivityRepository activityRepository,
+                          RequestAttachmentRepository attachmentRepository) {
         super(Request.class, false);
         this.workflowRepository = workflowRepository;
 
@@ -35,7 +37,7 @@ class ArchivedRequestsGrid extends Grid<Request> {
         addColumn(this::outcomeLabel).setHeader("Sonuç").setWidth("160px").setFlexGrow(0);
 
         setItemDetailsRenderer(new ComponentRenderer<>(
-                request -> new RequestDetailsPanel(request, activityRepository)));
+                request -> new RequestDetailsPanel(request, activityRepository, attachmentRepository)));
         setDetailsVisibleOnClick(true);
 
         setItems(loadArchivedRequests(requestRepository, workflowRepository));

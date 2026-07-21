@@ -12,11 +12,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 /** The password-change section of {@link ProfileView}. */
 class PasswordChangeForm extends VerticalLayout {
 
+    private static final int MIN_LENGTH = 3;
+    private static final int MAX_LENGTH = 6;
+
     PasswordChangeForm(AppUser currentUser, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         setPadding(false);
 
         PasswordField currentPasswordField = new PasswordField("Mevcut Şifre");
         PasswordField newPasswordField = new PasswordField("Yeni Şifre");
+        newPasswordField.setHelperText(MIN_LENGTH + "-" + MAX_LENGTH + " karakter arasında olmalı");
+        newPasswordField.setMaxLength(MAX_LENGTH);
         PasswordField confirmPasswordField = new PasswordField("Yeni Şifre (Tekrar)");
         currentPasswordField.setWidth("320px");
         newPasswordField.setWidth("320px");
@@ -27,11 +32,16 @@ class PasswordChangeForm extends VerticalLayout {
                 Toast.show("Mevcut şifre yanlış.");
                 return;
             }
-            if (newPasswordField.isEmpty() || !newPasswordField.getValue().equals(confirmPasswordField.getValue())) {
-                Toast.show("Yeni şifreler eşleşmiyor veya boş.");
+            String newPassword = newPasswordField.getValue();
+            if (newPassword.length() < MIN_LENGTH || newPassword.length() > MAX_LENGTH) {
+                Toast.show("Yeni şifre " + MIN_LENGTH + "-" + MAX_LENGTH + " karakter arasında olmalı.");
                 return;
             }
-            currentUser.setPassword(passwordEncoder.encode(newPasswordField.getValue()));
+            if (!newPassword.equals(confirmPasswordField.getValue())) {
+                Toast.show("Yeni şifreler eşleşmiyor.");
+                return;
+            }
+            currentUser.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(currentUser);
             currentPasswordField.clear();
             newPasswordField.clear();

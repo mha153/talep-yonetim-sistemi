@@ -5,6 +5,7 @@ import com.requestmanagement.base.model.Role;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
@@ -28,12 +29,13 @@ public class PendingRequestsView extends VerticalLayout {
                                 WorkflowRepository workflowRepository, UserRepository userRepository,
                                 NotificationRepository notificationRepository,
                                 RequestActivityRepository activityRepository,
+                                RequestAttachmentRepository attachmentRepository,
                                 RequestMessageRepository messageRepository) {
         AppUser currentPo = CurrentUserResolver.findOrCreate(
                 userRepository, SecurityContextHolder.getContext().getAuthentication(), Role.PRODUCT_OWNER);
         PendingRequestsGrid grid = new PendingRequestsGrid(requestRepository, prioritizationRepository,
-                workflowRepository, userRepository, notificationRepository, activityRepository, messageRepository,
-                currentPo);
+                workflowRepository, userRepository, notificationRepository, activityRepository, attachmentRepository,
+                messageRepository, currentPo);
 
         TextField searchField = new TextField();
         searchField.setPlaceholder("Müşteri veya Başlık ara...");

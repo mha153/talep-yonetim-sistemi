@@ -7,6 +7,7 @@ import com.requestmanagement.base.model.WorkflowStatus;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
@@ -25,9 +26,9 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 class MyTasksGrid extends Grid<Workflow> {
 
     MyTasksGrid(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository,
-                RequestActivityRepository activityRepository, RequestMessageRepository messageRepository,
-                NotificationRepository notificationRepository, UserRepository userRepository,
-                AppUser currentDeveloper) {
+                RequestActivityRepository activityRepository, RequestAttachmentRepository attachmentRepository,
+                RequestMessageRepository messageRepository, NotificationRepository notificationRepository,
+                UserRepository userRepository, AppUser currentDeveloper) {
         super(Workflow.class, false);
         setSizeFull();
 
@@ -43,7 +44,7 @@ class MyTasksGrid extends Grid<Workflow> {
                 .setHeader("İşlem");
 
         setItemDetailsRenderer(new ComponentRenderer<>(
-                workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository)));
+                workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository, attachmentRepository)));
         setDetailsVisibleOnClick(true);
 
         setItems(workflowRepository.findByDeveloperAndWorkflowStatusNot(currentDeveloper, WorkflowStatus.DONE));

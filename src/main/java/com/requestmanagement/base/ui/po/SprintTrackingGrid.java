@@ -7,6 +7,7 @@ import com.requestmanagement.base.model.WorkflowStatus;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
+import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
@@ -19,13 +20,16 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
+import java.util.Comparator;
+import java.util.List;
+
 /** PO-facing, read-only view of workflow items that are not yet done. */
 class SprintTrackingGrid extends Grid<Workflow> {
 
     SprintTrackingGrid(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository,
-                        RequestActivityRepository activityRepository, RequestMessageRepository messageRepository,
-                        NotificationRepository notificationRepository, UserRepository userRepository,
-                        AppUser currentPo) {
+                        RequestActivityRepository activityRepository, RequestAttachmentRepository attachmentRepository,
+                        RequestMessageRepository messageRepository, NotificationRepository notificationRepository,
+                        UserRepository userRepository, AppUser currentPo) {
         super(Workflow.class, false);
         setSizeFull();
 
@@ -44,10 +48,24 @@ class SprintTrackingGrid extends Grid<Workflow> {
                 .setHeader("İletişim").setWidth("140px").setFlexGrow(0);
 
         setItemDetailsRenderer(new ComponentRenderer<>(
-                workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository)));
+                workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository, attachmentRepository)));
         setDetailsVisibleOnClick(true);
 
-        setItems(workflowRepository.findByWorkflowStatusNot(WorkflowStatus.DONE));
+        setItems(sortByScore(workflowRepository.findByWorkflowStatusNot(WorkflowStatus.DONE),
+                prioritizationRepository));
+    }
+
+    private static List<Workflow> sortByScore(List<Workflow> workflows,
+                                               PrioritizationRepository prioritizationRepository) {
+        return workflows.stream()
+                .sorted(Comparator.comparingInt((Workflow w) -> scoreOf(w, prioritizationRepository)).reversed())
+                .toList();
+    }
+
+    private static int scoreOf(Workflow workflow, PrioritizationRepository prioritizationRepository) {
+        return prioritizationRepository.findByRequest(workflow.getRequest())
+                .map(p -> p.getPriorityScore())
+                .orElse(-1);
     }
 
     private HorizontalLayout buildCommunicationButtons(Workflow workflow, RequestMessageRepository messageRepository,
