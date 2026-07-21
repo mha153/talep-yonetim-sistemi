@@ -3,20 +3,20 @@ package com.requestmanagement.base.ui.notifications;
 import com.requestmanagement.base.model.AppNotification;
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.repository.NotificationRepository;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.List;
 
 /** A bell button showing the unread-notification count; opens a dialog and marks them all read. */
 public class NotificationBell extends Button {
+
+    private static final int COLLAPSED_LIMIT = 5;
 
     public NotificationBell(NotificationRepository notificationRepository, AppUser currentUser) {
         super(new Icon(VaadinIcon.BELL));
@@ -38,11 +38,7 @@ public class NotificationBell extends Button {
         dialog.setHeaderTitle("Bildirimler");
         VerticalLayout list = new VerticalLayout();
         list.setPadding(false);
-        if (notifications.isEmpty()) {
-            list.add(new Span("Bildirim yok."));
-        } else {
-            notifications.forEach(n -> list.add(notificationRow(n)));
-        }
+        renderList(list, notifications, false);
         dialog.add(list);
         dialog.open();
 
@@ -51,15 +47,20 @@ public class NotificationBell extends Button {
         updateBadge(notificationRepository, currentUser);
     }
 
-    private Component notificationRow(AppNotification notification) {
-        if (notification.getActor() == null) {
-            return new Span(notification.getMessage());
+    private void renderList(VerticalLayout list, List<AppNotification> notifications, boolean showAll) {
+        list.removeAll();
+        if (notifications.isEmpty()) {
+            list.add(new Span("Bildirim yok."));
+            return;
         }
-        Span actorName = new Span(notification.getActor().getNameSurname());
-        actorName.getStyle().set("font-weight", "600");
-        HorizontalLayout row = new HorizontalLayout(actorName, new Span(notification.getMessage()));
-        row.setSpacing(false);
-        row.getStyle().set("gap", "4px");
-        return row;
+        List<AppNotification> visible =
+                showAll ? notifications : notifications.stream().limit(COLLAPSED_LIMIT).toList();
+        visible.forEach(n -> list.add(NotificationRow.create(n)));
+
+        if (!showAll && notifications.size() > COLLAPSED_LIMIT) {
+            Button showAllButton = new Button("Tümünü Göster", e -> renderList(list, notifications, true));
+            showAllButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+            list.add(showAllButton);
+        }
     }
 }
