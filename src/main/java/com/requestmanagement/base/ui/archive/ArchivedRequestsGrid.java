@@ -11,6 +11,7 @@ import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
 import com.requestmanagement.base.ui.shared.RequestScoreBadge;
+import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
@@ -19,12 +20,15 @@ import java.util.stream.Stream;
 
 class ArchivedRequestsGrid extends Grid<Request> {
 
+    private final transient RequestRepository requestRepository;
     private final transient WorkflowRepository workflowRepository;
+    private String searchText = "";
 
     ArchivedRequestsGrid(RequestRepository requestRepository, PrioritizationRepository prioritizationRepository,
                           WorkflowRepository workflowRepository, RequestActivityRepository activityRepository,
                           RequestAttachmentRepository attachmentRepository) {
         super(Request.class, false);
+        this.requestRepository = requestRepository;
         this.workflowRepository = workflowRepository;
 
         setSizeFull();
@@ -40,15 +44,22 @@ class ArchivedRequestsGrid extends Grid<Request> {
                 request -> new RequestDetailsPanel(request, activityRepository, attachmentRepository)));
         setDetailsVisibleOnClick(true);
 
-        setItems(loadArchivedRequests(requestRepository, workflowRepository));
+        refresh();
     }
 
-    private List<Request> loadArchivedRequests(RequestRepository requestRepository, WorkflowRepository workflowRepository) {
+    void search(String text) {
+        this.searchText = text;
+        refresh();
+    }
+
+    void refresh() {
         List<Request> rejected = requestRepository.findByStatus(RequestStatus.REJECTED);
         List<Request> completed = workflowRepository.findByWorkflowStatus(WorkflowStatus.DONE).stream()
                 .map(Workflow::getRequest)
                 .toList();
-        return Stream.concat(rejected.stream(), completed.stream()).toList();
+        List<Request> requests = Stream.concat(rejected.stream(), completed.stream()).toList();
+        setItems(RequestSearchFilter.apply(requests, searchText,
+                r -> r.getCustomer().getNameSurname(), Request::getTitle));
     }
 
     private String outcomeLabel(Request request) {

@@ -3,6 +3,7 @@ package com.requestmanagement.base.ui.shared;
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.UserRepository;
+import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.notifications.NotificationBell;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -30,12 +31,14 @@ public final class MainLayout extends AppLayout {
     private final transient AuthenticationContext authContext;
     private final transient UserRepository userRepository;
     private final transient NotificationRepository notificationRepository;
+    private final transient WorkflowRepository workflowRepository;
 
     public MainLayout(AuthenticationContext authContext, UserRepository userRepository,
-                       NotificationRepository notificationRepository) {
+                       NotificationRepository notificationRepository, WorkflowRepository workflowRepository) {
         this.authContext = authContext;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
+        this.workflowRepository = workflowRepository;
         setPrimarySection(Section.DRAWER);
         addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
     }
@@ -49,7 +52,8 @@ public final class MainLayout extends AppLayout {
         appName.addClassName("app-name");
 
         var header = new HorizontalLayout(appLogo, appName, new ThemeToggle());
-        currentUser().ifPresent(user -> header.add(new NotificationBell(notificationRepository, user)));
+        currentUser().ifPresent(user ->
+                header.add(new NotificationBell(notificationRepository, workflowRepository, user)));
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setPadding(true);
         return header;

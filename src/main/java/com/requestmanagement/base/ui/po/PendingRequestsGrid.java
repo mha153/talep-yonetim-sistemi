@@ -13,6 +13,7 @@ import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
 import com.requestmanagement.base.ui.shared.RequestScoreBadge;
+import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
@@ -50,7 +51,7 @@ class PendingRequestsGrid extends Grid<Request> {
     }
 
     void search(String text) {
-        this.searchText = text == null ? "" : text.toLowerCase();
+        this.searchText = text;
         refresh();
     }
 
@@ -58,12 +59,8 @@ class PendingRequestsGrid extends Grid<Request> {
         List<Request> requests = requestRepository.findByStatusIn(LISTED_STATUSES).stream()
                 .filter(r -> !workflowRepository.existsByRequest(r))
                 .toList();
-        if (!searchText.isBlank()) {
-            requests = requests.stream()
-                    .filter(r -> r.getCustomer().getNameSurname().toLowerCase().contains(searchText)
-                            || r.getTitle().toLowerCase().contains(searchText))
-                    .toList();
-        }
+        requests = RequestSearchFilter.apply(requests, searchText,
+                r -> r.getCustomer().getNameSurname(), Request::getTitle);
         requests = requests.stream()
                 .sorted(Comparator.comparingInt(this::scoreOf).reversed())
                 .toList();

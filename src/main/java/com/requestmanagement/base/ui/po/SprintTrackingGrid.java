@@ -11,26 +11,33 @@ import com.requestmanagement.base.repository.RequestAttachmentRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
+import com.requestmanagement.base.ui.developer.SprintPoolSorter;
 import com.requestmanagement.base.ui.messaging.MessageIndicatorIcon;
 import com.requestmanagement.base.ui.messaging.RequestConversationDialog;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
+import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
-import java.util.Comparator;
 import java.util.List;
 
 /** PO-facing, read-only view of workflow items that are not yet done. */
 class SprintTrackingGrid extends Grid<Workflow> {
+
+    private final transient WorkflowRepository workflowRepository;
+    private final transient PrioritizationRepository prioritizationRepository;
+    private String searchText = "";
 
     SprintTrackingGrid(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository,
                         RequestActivityRepository activityRepository, RequestAttachmentRepository attachmentRepository,
                         RequestMessageRepository messageRepository, NotificationRepository notificationRepository,
                         UserRepository userRepository, AppUser currentPo) {
         super(Workflow.class, false);
+        this.workflowRepository = workflowRepository;
+        this.prioritizationRepository = prioritizationRepository;
         setSizeFull();
 
         addColumn(workflow -> workflow.getRequest().getRequestId()).setHeader("ID").setWidth("60px").setFlexGrow(0);
@@ -51,21 +58,19 @@ class SprintTrackingGrid extends Grid<Workflow> {
                 workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository, attachmentRepository)));
         setDetailsVisibleOnClick(true);
 
-        setItems(sortByScore(workflowRepository.findByWorkflowStatusNot(WorkflowStatus.DONE),
-                prioritizationRepository));
+        refresh();
     }
 
-    private static List<Workflow> sortByScore(List<Workflow> workflows,
-                                               PrioritizationRepository prioritizationRepository) {
-        return workflows.stream()
-                .sorted(Comparator.comparingInt((Workflow w) -> scoreOf(w, prioritizationRepository)).reversed())
-                .toList();
+    void search(String text) {
+        this.searchText = text;
+        refresh();
     }
 
-    private static int scoreOf(Workflow workflow, PrioritizationRepository prioritizationRepository) {
-        return prioritizationRepository.findByRequest(workflow.getRequest())
-                .map(p -> p.getPriorityScore())
-                .orElse(-1);
+    void refresh() {
+        List<Workflow> workflows = workflowRepository.findByWorkflowStatusNot(WorkflowStatus.DONE);
+        workflows = RequestSearchFilter.apply(workflows, searchText,
+                w -> w.getRequest().getCustomer().getNameSurname(), w -> w.getRequest().getTitle());
+        setItems(SprintPoolSorter.byScoreDescending(workflows, prioritizationRepository));
     }
 
     private HorizontalLayout buildCommunicationButtons(Workflow workflow, RequestMessageRepository messageRepository,

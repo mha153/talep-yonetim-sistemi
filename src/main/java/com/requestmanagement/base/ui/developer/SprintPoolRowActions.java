@@ -3,9 +3,7 @@ package com.requestmanagement.base.ui.developer;
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.model.MessageChannel;
 import com.requestmanagement.base.model.Workflow;
-import com.requestmanagement.base.model.WorkflowStatus;
 import com.requestmanagement.base.repository.NotificationRepository;
-import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
@@ -26,11 +24,10 @@ final class SprintPoolRowActions {
     }
 
     static HorizontalLayout build(Workflow workflow, WorkflowRepository workflowRepository,
-                                   PrioritizationRepository prioritizationRepository, UserRepository userRepository,
-                                   NotificationRepository notificationRepository,
+                                   UserRepository userRepository, NotificationRepository notificationRepository,
                                    RequestActivityRepository activityRepository,
                                    RequestMessageRepository messageRepository, AppUser currentDeveloper,
-                                   Grid<Workflow> grid) {
+                                   Grid<Workflow> grid, Runnable onClaimed) {
         Button noteButton = new Button("Not", e -> new RequestConversationDialog(workflow.getRequest(),
                 MessageChannel.INTERNAL, "Developer Notu", messageRepository, notificationRepository,
                 userRepository, currentDeveloper, () -> grid.getDataProvider().refreshItem(workflow)).open());
@@ -38,7 +35,7 @@ final class SprintPoolRowActions {
         boolean unread = messageRepository.existsByRequestAndChannelAndReadFalseAndAuthorNot(
                 workflow.getRequest(), MessageChannel.INTERNAL, currentDeveloper);
 
-        Button viewCustomerChatButton = new Button("Müşteri Görüşmesi", e -> new RequestConversationView(
+        Button viewCustomerChatButton = new Button("Görüşme", e -> new RequestConversationView(
                 workflow.getRequest(), MessageChannel.CUSTOMER_PO, "Müşteri Görüşmesi", messageRepository).open());
         viewCustomerChatButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
 
@@ -46,9 +43,7 @@ final class SprintPoolRowActions {
             WorkflowActions.claim(workflow, currentDeveloper, workflowRepository, userRepository,
                     notificationRepository, activityRepository);
             Toast.show("Görevi üstlendiniz.");
-            grid.setItems(SprintPoolSorter.byScoreDescending(
-                    workflowRepository.findByDeveloperIsNullAndWorkflowStatusNot(WorkflowStatus.DONE),
-                    prioritizationRepository));
+            onClaimed.run();
         });
         claimButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         return new HorizontalLayout(claimButton, MessageIndicatorIcon.wrap(noteButton, unread),

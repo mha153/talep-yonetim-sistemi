@@ -35,7 +35,7 @@ final class NavigationMenuFactory {
         boolean isDeveloper = hasRole(auth, "ROLE_DEVELOPER");
 
         if (isCustomer) {
-            nav.addItem(new SideNavItem("Talep Oluştur", CustomerRequestView.class));
+            nav.addItem(new SideNavItem("Taleplerim", CustomerRequestView.class));
         }
 
         if (isProductOwner) {

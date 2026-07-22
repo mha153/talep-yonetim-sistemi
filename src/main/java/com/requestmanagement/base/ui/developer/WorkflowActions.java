@@ -28,6 +28,28 @@ final class WorkflowActions {
                 developer, "bir görevi üstlendi: " + workflow.getRequest().getTitle());
     }
 
+    static void release(Workflow workflow, AppUser developer, WorkflowRepository workflowRepository,
+                         UserRepository userRepository, NotificationRepository notificationRepository,
+                         RequestActivityRepository activityRepository) {
+        workflow.setDeveloper(null);
+        workflow.setWorkflowStatus(WorkflowStatus.BACKLOG);
+        workflowRepository.save(workflow);
+        ActivityRecorder.record(activityRepository, workflow.getRequest(),
+                developer.getNameSurname() + " görevi havuza geri bıraktı");
+        NotificationCenter.notifyProductOwner(notificationRepository, userRepository, workflow.getRequest(),
+                developer, "bir görevi havuza geri bıraktı: " + workflow.getRequest().getTitle());
+    }
+
+    static void startTesting(Workflow workflow, AppUser developer, WorkflowRepository workflowRepository,
+                              UserRepository userRepository, NotificationRepository notificationRepository,
+                              RequestActivityRepository activityRepository) {
+        workflow.setWorkflowStatus(WorkflowStatus.TESTING);
+        workflowRepository.save(workflow);
+        ActivityRecorder.record(activityRepository, workflow.getRequest(), "Test aşamasına alındı");
+        NotificationCenter.notifyProductOwner(notificationRepository, userRepository, workflow.getRequest(),
+                developer, "bir görevi test aşamasına aldı: " + workflow.getRequest().getTitle());
+    }
+
     static void complete(Workflow workflow, AppUser developer, WorkflowRepository workflowRepository,
                           NotificationRepository notificationRepository,
                           RequestActivityRepository activityRepository) {

@@ -38,7 +38,7 @@ class RequestHistoryGrid extends VerticalLayout {
     private final transient WorkflowRepository workflowRepository;
     private final transient Supplier<List<Request>> requestsSupplier;
     private final transient Supplier<AppUser> currentUser;
-    private final Grid<Request> grid = new Grid<>(Request.class, false);
+    final Grid<Request> grid = new Grid<>(Request.class, false);
 
     RequestHistoryGrid(RequestRepository requestRepository, RequestActivityRepository activityRepository,
                         RequestAttachmentRepository attachmentRepository, RequestMessageRepository messageRepository,

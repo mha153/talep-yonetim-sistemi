@@ -10,8 +10,13 @@ import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.shared.CurrentUserResolver;
+import com.requestmanagement.base.ui.shared.GridRowHighlighter;
 import com.requestmanagement.base.ui.shared.MainLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -21,7 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Route(value = "sprint-tracking", layout = MainLayout.class)
 @PageTitle("Sprint Takibi")
 @RolesAllowed("PRODUCT_OWNER")
-public class SprintTrackingView extends VerticalLayout {
+public class SprintTrackingView extends VerticalLayout implements BeforeEnterObserver {
+
+    private final SprintTrackingGrid grid;
 
     public SprintTrackingView(WorkflowRepository workflowRepository, PrioritizationRepository prioritizationRepository,
                                UserRepository userRepository, NotificationRepository notificationRepository,
@@ -30,8 +37,22 @@ public class SprintTrackingView extends VerticalLayout {
                                RequestMessageRepository messageRepository) {
         AppUser currentPo = CurrentUserResolver.findOrCreate(
                 userRepository, SecurityContextHolder.getContext().getAuthentication(), Role.PRODUCT_OWNER);
+        grid = new SprintTrackingGrid(workflowRepository, prioritizationRepository, activityRepository,
+                attachmentRepository, messageRepository, notificationRepository, userRepository, currentPo);
+
+        TextField searchField = new TextField();
+        searchField.setPlaceholder("Müşteri veya Başlık ara...");
+        searchField.setClearButtonVisible(true);
+        searchField.setValueChangeMode(ValueChangeMode.LAZY);
+        searchField.addValueChangeListener(e -> grid.search(e.getValue()));
+
         setSizeFull();
-        add(new SprintTrackingGrid(workflowRepository, prioritizationRepository, activityRepository,
-                attachmentRepository, messageRepository, notificationRepository, userRepository, currentPo));
+        add(searchField, grid);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        event.getLocation().getQueryParameters().getSingleParameter("highlight").map(Long::valueOf)
+                .ifPresent(id -> GridRowHighlighter.apply(grid, w -> w.getRequest().getRequestId(), id));
     }
 }

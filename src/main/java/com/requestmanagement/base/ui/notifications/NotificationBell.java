@@ -3,6 +3,7 @@ package com.requestmanagement.base.ui.notifications;
 import com.requestmanagement.base.model.AppNotification;
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.repository.NotificationRepository;
+import com.requestmanagement.base.repository.WorkflowRepository;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -18,8 +19,14 @@ public class NotificationBell extends Button {
 
     private static final int COLLAPSED_LIMIT = 5;
 
-    public NotificationBell(NotificationRepository notificationRepository, AppUser currentUser) {
+    private final transient WorkflowRepository workflowRepository;
+    private final transient AppUser currentUser;
+
+    public NotificationBell(NotificationRepository notificationRepository, WorkflowRepository workflowRepository,
+                             AppUser currentUser) {
         super(new Icon(VaadinIcon.BELL));
+        this.workflowRepository = workflowRepository;
+        this.currentUser = currentUser;
         addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         updateBadge(notificationRepository, currentUser);
         addClickListener(e -> openDialog(notificationRepository, currentUser));
@@ -38,7 +45,7 @@ public class NotificationBell extends Button {
         dialog.setHeaderTitle("Bildirimler");
         VerticalLayout list = new VerticalLayout();
         list.setPadding(false);
-        renderList(list, notifications, false);
+        renderList(list, notifications, false, dialog);
         dialog.add(list);
         dialog.open();
 
@@ -47,7 +54,8 @@ public class NotificationBell extends Button {
         updateBadge(notificationRepository, currentUser);
     }
 
-    private void renderList(VerticalLayout list, List<AppNotification> notifications, boolean showAll) {
+    private void renderList(VerticalLayout list, List<AppNotification> notifications, boolean showAll,
+                             Dialog dialog) {
         list.removeAll();
         if (notifications.isEmpty()) {
             list.add(new Span("Bildirim yok."));
@@ -55,10 +63,10 @@ public class NotificationBell extends Button {
         }
         List<AppNotification> visible =
                 showAll ? notifications : notifications.stream().limit(COLLAPSED_LIMIT).toList();
-        visible.forEach(n -> list.add(NotificationRow.create(n)));
+        visible.forEach(n -> list.add(NotificationRow.create(n, currentUser, workflowRepository, dialog)));
 
         if (!showAll && notifications.size() > COLLAPSED_LIMIT) {
-            Button showAllButton = new Button("Tümünü Göster", e -> renderList(list, notifications, true));
+            Button showAllButton = new Button("Tümünü Göster", e -> renderList(list, notifications, true, dialog));
             showAllButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
             list.add(showAllButton);
         }

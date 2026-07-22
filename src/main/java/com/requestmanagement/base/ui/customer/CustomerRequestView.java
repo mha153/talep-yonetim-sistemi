@@ -11,9 +11,12 @@ import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.shared.CurrentUserResolver;
+import com.requestmanagement.base.ui.shared.GridRowHighlighter;
 import com.requestmanagement.base.ui.shared.MainLayout;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +25,7 @@ import java.util.List;
 
 @Route(value = "create-request", layout = MainLayout.class)
 @RolesAllowed("CUSTOMER")
-public class CustomerRequestView extends VerticalLayout {
+public class CustomerRequestView extends VerticalLayout implements BeforeEnterObserver {
 
     private final transient RequestRepository requestRepository;
     private final transient UserRepository userRepository;
@@ -57,5 +60,11 @@ public class CustomerRequestView extends VerticalLayout {
     private AppUser getCurrentCustomer() {
         return CurrentUserResolver.findOrCreate(
                 userRepository, SecurityContextHolder.getContext().getAuthentication(), Role.CUSTOMER);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        event.getLocation().getQueryParameters().getSingleParameter("highlight").map(Long::valueOf)
+                .ifPresent(id -> GridRowHighlighter.apply(historyGrid.grid, Request::getRequestId, id));
     }
 }
