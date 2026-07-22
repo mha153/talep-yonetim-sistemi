@@ -15,6 +15,7 @@ import com.requestmanagement.base.ui.shared.CurrentUserResolver;
 import com.requestmanagement.base.ui.shared.GridRowHighlighter;
 import com.requestmanagement.base.ui.shared.MainLayout;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
+import com.requestmanagement.base.ui.shared.RequestScoreBadge;
 import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -52,10 +53,10 @@ public class SprintView extends VerticalLayout implements BeforeEnterObserver {
                 .setHeader("ID").setWidth("60px").setFlexGrow(0);
         grid.addColumn(workflow -> workflow.getRequest().getCustomer().getNameSurname())
                 .setHeader("Müşteri").setFlexGrow(1);
-        grid.addColumn(workflow -> workflow.getRequest().getTitle()).setHeader("Başlık").setFlexGrow(1);
-        grid.addColumn(workflow -> prioritizationRepository.findByRequest(workflow.getRequest())
-                .map(p -> String.valueOf(p.getPriorityScore()))
-                .orElse("Belirlenmedi")).setHeader("Skor").setWidth("100px").setFlexGrow(0);
+        grid.addColumn(workflow -> workflow.getRequest().getTitle()).setHeader("Başlık").setFlexGrow(2);
+        grid.addComponentColumn(workflow -> RequestScoreBadge.create(
+                prioritizationRepository.findByRequest(workflow.getRequest()).orElse(null)))
+                .setHeader("Skor").setWidth("150px").setFlexGrow(0);
 
         grid.addComponentColumn(workflow -> SprintPoolRowActions.build(workflow, workflowRepository,
                 userRepository, notificationRepository, activityRepository, messageRepository, currentDeveloper,

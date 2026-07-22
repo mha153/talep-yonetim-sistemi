@@ -15,6 +15,7 @@ import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -37,7 +38,7 @@ class ArchivedRequestsGrid extends Grid<Request> {
         addColumn(Request::getTitle).setHeader("Başlık").setFlexGrow(2);
         addColumn(new ComponentRenderer<>(request ->
                 RequestScoreBadge.create(prioritizationRepository.findByRequest(request).orElse(null))))
-                .setHeader("Skor").setWidth("130px").setFlexGrow(0);
+                .setHeader("Skor").setWidth("150px").setFlexGrow(0);
         addColumn(this::outcomeLabel).setHeader("Sonuç").setWidth("160px").setFlexGrow(0);
 
         setItemDetailsRenderer(new ComponentRenderer<>(
@@ -57,7 +58,9 @@ class ArchivedRequestsGrid extends Grid<Request> {
         List<Request> completed = workflowRepository.findByWorkflowStatus(WorkflowStatus.DONE).stream()
                 .map(Workflow::getRequest)
                 .toList();
-        List<Request> requests = Stream.concat(rejected.stream(), completed.stream()).toList();
+        List<Request> requests = Stream.concat(rejected.stream(), completed.stream())
+                .sorted(Comparator.comparing(Request::getRequestId).reversed())
+                .toList();
         setItems(RequestSearchFilter.apply(requests, searchText,
                 r -> r.getCustomer().getNameSurname(), Request::getTitle));
     }

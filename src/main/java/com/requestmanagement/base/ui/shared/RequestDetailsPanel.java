@@ -25,6 +25,10 @@ public class RequestDetailsPanel extends VerticalLayout {
         setPadding(false);
         setSpacing(false);
 
+        Span title = new Span("Başlık: " + request.getTitle());
+        title.getStyle().set("font-weight", "600");
+        add(title);
+
         Span description = new Span("Açıklama: " + request.getDescription());
         description.getStyle().set("white-space", "pre-wrap");
         add(description);

@@ -15,4 +15,6 @@ public interface RequestMessageRepository extends JpaRepository<RequestMessage, 
                                                                 AppUser author);
 
     boolean existsByRequestAndReadFalseAndAuthorNot(Request request, AppUser author);
+
+    List<RequestMessage> findByRequest(Request request);
 }

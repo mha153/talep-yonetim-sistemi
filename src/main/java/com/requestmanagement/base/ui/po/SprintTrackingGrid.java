@@ -15,6 +15,7 @@ import com.requestmanagement.base.ui.developer.SprintPoolSorter;
 import com.requestmanagement.base.ui.messaging.MessageIndicatorIcon;
 import com.requestmanagement.base.ui.messaging.RequestConversationDialog;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
+import com.requestmanagement.base.ui.shared.RequestScoreBadge;
 import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -42,10 +43,10 @@ class SprintTrackingGrid extends Grid<Workflow> {
 
         addColumn(workflow -> workflow.getRequest().getRequestId()).setHeader("ID").setWidth("60px").setFlexGrow(0);
         addColumn(workflow -> workflow.getRequest().getCustomer().getNameSurname()).setHeader("Müşteri").setFlexGrow(1);
-        addColumn(workflow -> workflow.getRequest().getTitle()).setHeader("Başlık").setFlexGrow(1);
-        addColumn(workflow -> prioritizationRepository.findByRequest(workflow.getRequest())
-                .map(p -> String.valueOf(p.getPriorityScore()))
-                .orElse("Belirlenmedi")).setHeader("Skor").setWidth("100px").setFlexGrow(0);
+        addColumn(workflow -> workflow.getRequest().getTitle()).setHeader("Başlık").setFlexGrow(2);
+        addComponentColumn(workflow -> RequestScoreBadge.create(
+                prioritizationRepository.findByRequest(workflow.getRequest()).orElse(null)))
+                .setHeader("Skor").setWidth("150px").setFlexGrow(0);
         addColumn(workflow -> workflow.getWorkflowStatus().displayLabel())
                 .setHeader("Durum").setWidth("140px").setFlexGrow(0);
         addColumn(workflow -> workflow.getDeveloper() == null ? "Atanmadı" : workflow.getDeveloper().getNameSurname())

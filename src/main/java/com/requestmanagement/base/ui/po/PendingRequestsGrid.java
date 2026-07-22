@@ -61,10 +61,9 @@ class PendingRequestsGrid extends Grid<Request> {
                 .toList();
         requests = RequestSearchFilter.apply(requests, searchText,
                 r -> r.getCustomer().getNameSurname(), Request::getTitle);
-        requests = requests.stream()
-                .sorted(Comparator.comparingInt(this::scoreOf).reversed())
-                .toList();
-        setItems(requests);
+        Comparator<Request> byScoreThenNewest = Comparator.comparingInt(this::scoreOf).reversed()
+                .thenComparing(Comparator.comparing(Request::getRequestId).reversed());
+        setItems(requests.stream().sorted(byScoreThenNewest).toList());
     }
 
     private void configureColumns(UserRepository userRepository, NotificationRepository notificationRepository,
@@ -74,7 +73,7 @@ class PendingRequestsGrid extends Grid<Request> {
         addColumn(Request::getTitle).setHeader("Talep Başlığı").setFlexGrow(2);
         addColumn(new ComponentRenderer<>(request ->
                 RequestScoreBadge.create(prioritizationRepository.findByRequest(request).orElse(null))))
-                .setHeader("Skor").setWidth("130px").setFlexGrow(0);
+                .setHeader("Skor").setWidth("150px").setFlexGrow(0);
         addColumn(request -> request.getStatus().displayLabel()).setHeader("Durum").setWidth("160px").setFlexGrow(0);
         addComponentColumn(request -> RequestActionButtons.create(request, requestRepository,
                 prioritizationRepository, workflowRepository, userRepository, notificationRepository,

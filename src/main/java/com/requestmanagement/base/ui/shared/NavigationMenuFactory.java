@@ -1,5 +1,8 @@
 package com.requestmanagement.base.ui.shared;
 
+import com.requestmanagement.base.repository.RequestRepository;
+import com.requestmanagement.base.repository.UserRepository;
+import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.archive.CompletedView;
 import com.requestmanagement.base.ui.customer.CustomerRequestView;
 import com.requestmanagement.base.ui.developer.MyTasksView;
@@ -24,7 +27,8 @@ final class NavigationMenuFactory {
     private NavigationMenuFactory() {
     }
 
-    static SideNav buildSideNav(@Nullable Authentication auth) {
+    static SideNav buildSideNav(@Nullable Authentication auth, RequestRepository requestRepository,
+                                 WorkflowRepository workflowRepository, UserRepository userRepository) {
         var nav = new SideNav();
         if (auth == null) {
             return nav;
@@ -40,14 +44,20 @@ final class NavigationMenuFactory {
 
         if (isProductOwner) {
             nav.addItem(new SideNavItem("Genel Bakış", DashboardView.class));
-            nav.addItem(new SideNavItem("Gelen Talepler", PendingRequestsView.class));
+            nav.addItem(new SideNavItem(NavigationBadges.withCount("Gelen Talepler",
+                    NavigationBadges.pendingRequests(requestRepository, workflowRepository)),
+                    PendingRequestsView.class));
             nav.addItem(new SideNavItem("Sprint Takibi", SprintTrackingView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
         }
 
         if (isDeveloper) {
-            nav.addItem(new SideNavItem("Sprint Havuzu", SprintView.class));
-            nav.addItem(new SideNavItem("Görevlerim", MyTasksView.class));
+            nav.addItem(new SideNavItem(NavigationBadges.withCount("Sprint Havuzu",
+                    NavigationBadges.sprintPool(workflowRepository)), SprintView.class));
+            long myTasksCount = CurrentUserResolver.find(userRepository, auth)
+                    .map(developer -> NavigationBadges.myTasks(workflowRepository, developer))
+                    .orElse(0L);
+            nav.addItem(new SideNavItem(NavigationBadges.withCount("Görevlerim", myTasksCount), MyTasksView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
         }
 

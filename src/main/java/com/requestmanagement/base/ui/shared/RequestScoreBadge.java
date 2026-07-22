@@ -20,10 +20,20 @@ public final class RequestScoreBadge {
             return badge;
         }
         int score = prioritization.getPriorityScore();
-        badge.setText(String.valueOf(score));
+        badge.setText(score + " (" + shortLabel(score) + ")");
         badge.getElement().getThemeList().add("badge");
         badge.getElement().getThemeList().add(theme(score));
         return badge;
+    }
+
+    public static String shortLabel(int score) {
+        if (score >= 80) {
+            return "Kritik";
+        }
+        if (score >= 40) {
+            return "Orta";
+        }
+        return "Düşük";
     }
 
     public static String theme(int score) {

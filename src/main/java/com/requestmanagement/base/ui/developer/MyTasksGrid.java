@@ -11,9 +11,12 @@ import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.shared.RequestDetailsPanel;
+import com.requestmanagement.base.ui.shared.RequestScoreBadge;
 import com.requestmanagement.base.ui.shared.RequestSearchFilter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+
+import java.util.Comparator;
 
 /** A developer's own claimed workflow items, separate from the shared Sprint pool. */
 class MyTasksGrid extends Grid<Workflow> {
@@ -34,10 +37,10 @@ class MyTasksGrid extends Grid<Workflow> {
         addColumn(workflow -> workflow.getRequest().getRequestId()).setHeader("ID").setWidth("60px").setFlexGrow(0);
         addColumn(workflow -> workflow.getRequest().getCustomer().getNameSurname())
                 .setHeader("Müşteri").setFlexGrow(1);
-        addColumn(workflow -> workflow.getRequest().getTitle()).setHeader("Başlık").setFlexGrow(1);
-        addColumn(workflow -> prioritizationRepository.findByRequest(workflow.getRequest())
-                .map(p -> String.valueOf(p.getPriorityScore()))
-                .orElse("Belirlenmedi")).setHeader("Skor").setWidth("100px").setFlexGrow(0);
+        addColumn(workflow -> workflow.getRequest().getTitle()).setHeader("Başlık").setFlexGrow(2);
+        addComponentColumn(workflow -> RequestScoreBadge.create(
+                prioritizationRepository.findByRequest(workflow.getRequest()).orElse(null)))
+                .setHeader("Skor").setWidth("150px").setFlexGrow(0);
         addColumn(workflow -> workflow.getWorkflowStatus().displayLabel())
                 .setHeader("Durum").setWidth("140px").setFlexGrow(0);
         addComponentColumn(workflow -> MyTaskRowActions.build(workflow, workflowRepository, userRepository,
@@ -58,7 +61,10 @@ class MyTasksGrid extends Grid<Workflow> {
 
     void refresh() {
         var workflows = workflowRepository.findByDeveloperAndWorkflowStatusNot(currentDeveloper, WorkflowStatus.DONE);
-        setItems(RequestSearchFilter.apply(workflows, searchText,
-                w -> w.getRequest().getCustomer().getNameSurname(), w -> w.getRequest().getTitle()));
+        workflows = RequestSearchFilter.apply(workflows, searchText,
+                w -> w.getRequest().getCustomer().getNameSurname(), w -> w.getRequest().getTitle());
+        setItems(workflows.stream()
+                .sorted(Comparator.comparing((Workflow w) -> w.getRequest().getRequestId()).reversed())
+                .toList());
     }
 }

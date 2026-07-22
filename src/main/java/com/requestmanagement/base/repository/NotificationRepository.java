@@ -2,6 +2,7 @@ package com.requestmanagement.base.repository;
 
 import com.requestmanagement.base.model.AppNotification;
 import com.requestmanagement.base.model.AppUser;
+import com.requestmanagement.base.model.Request;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -10,4 +11,6 @@ public interface NotificationRepository extends JpaRepository<AppNotification, L
     List<AppNotification> findByRecipientOrderByCreatedAtDesc(AppUser recipient);
 
     long countByRecipientAndReadFalse(AppUser recipient);
+
+    List<AppNotification> findByRequest(Request request);
 }

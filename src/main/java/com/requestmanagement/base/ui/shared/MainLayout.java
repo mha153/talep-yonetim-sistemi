@@ -2,6 +2,7 @@ package com.requestmanagement.base.ui.shared;
 
 import com.requestmanagement.base.model.AppUser;
 import com.requestmanagement.base.repository.NotificationRepository;
+import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.notifications.NotificationBell;
@@ -32,13 +33,16 @@ public final class MainLayout extends AppLayout {
     private final transient UserRepository userRepository;
     private final transient NotificationRepository notificationRepository;
     private final transient WorkflowRepository workflowRepository;
+    private final transient RequestRepository requestRepository;
 
     public MainLayout(AuthenticationContext authContext, UserRepository userRepository,
-                       NotificationRepository notificationRepository, WorkflowRepository workflowRepository) {
+                       NotificationRepository notificationRepository, WorkflowRepository workflowRepository,
+                       RequestRepository requestRepository) {
         this.authContext = authContext;
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
         this.workflowRepository = workflowRepository;
+        this.requestRepository = requestRepository;
         setPrimarySection(Section.DRAWER);
         addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
     }
@@ -61,7 +65,8 @@ public final class MainLayout extends AppLayout {
 
     private Component createApplicationDrawer() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
-        var scroller = new Scroller(NavigationMenuFactory.buildSideNav(auth));
+        var scroller = new Scroller(NavigationMenuFactory.buildSideNav(
+                auth, requestRepository, workflowRepository, userRepository));
         scroller.addThemeVariants(ScrollerVariant.OVERFLOW_INDICATORS);
         return scroller;
     }

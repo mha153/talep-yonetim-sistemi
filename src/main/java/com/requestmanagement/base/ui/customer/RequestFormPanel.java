@@ -35,7 +35,9 @@ class RequestFormPanel extends VerticalLayout {
                       RequestAttachmentRepository attachmentRepository, Supplier<AppUser> currentCustomer,
                       Runnable onSaved) {
         TextField titleField = new TextField("Talep Başlığı");
+        titleField.setPlaceholder("Örn: Ödeme ekranında kredi kartı hata uyarısı alınıyor...");
         TextArea descriptionField = new TextArea("Açıklama");
+        descriptionField.setPlaceholder("Yaşanan problemi veya eklenmesini istediğiniz özelliği detaylıca yazınız...");
         descriptionField.setMinHeight("120px");
 
         AtomicReference<byte[]> uploadedData = new AtomicReference<>();
