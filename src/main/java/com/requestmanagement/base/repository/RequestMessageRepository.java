@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+/** Data access for {@link RequestMessage} rows. */
 public interface RequestMessageRepository extends JpaRepository<RequestMessage, Long> {
     List<RequestMessage> findByRequestAndChannelOrderByCreatedAtAsc(Request request, MessageChannel channel);
 
@@ -17,4 +18,6 @@ public interface RequestMessageRepository extends JpaRepository<RequestMessage, 
     boolean existsByRequestAndReadFalseAndAuthorNot(Request request, AppUser author);
 
     List<RequestMessage> findByRequest(Request request);
+
+    boolean existsByAuthor(AppUser author);
 }

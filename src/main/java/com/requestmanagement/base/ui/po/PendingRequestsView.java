@@ -24,6 +24,7 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+/** The "Gelen Talepler" page: search box plus the pending-requests table. */
 @Route(value = "pending-requests", layout = MainLayout.class)
 @PageTitle("Gelen Talepler")
 @RolesAllowed("PRODUCT_OWNER")

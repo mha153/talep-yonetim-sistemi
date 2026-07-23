@@ -1,5 +1,6 @@
 package com.requestmanagement.base.model;
 
+/** The three user roles the system supports; drives both screen access and Spring Security authorities. */
 public enum Role {
     CUSTOMER,
     PRODUCT_OWNER,

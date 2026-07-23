@@ -20,7 +20,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import org.jspecify.annotations.Nullable;
 
-/** priority_score = impact x urgency x 4 (max 100). */
+/**
+ * priority_score = WSJF-style base: (impact + urgency) / effort x 10 (max 100); effort defaults to 1 until a
+ * developer sets it. The score shown elsewhere in the app also ages +3%/day while waiting, see RequestScoreBadge.
+ */
 public class PrioritizationDialog extends Dialog {
 
     public PrioritizationDialog(Request request, PrioritizationRepository prioritizationRepository,
@@ -66,7 +69,9 @@ public class PrioritizationDialog extends Dialog {
             return;
         }
 
-        int score = RequestScoreBadge.compute(impact, urgency);
+        int effort = existing != null && existing.getEffort() != null
+                ? existing.getEffort() : RequestScoreBadge.DEFAULT_EFFORT;
+        int score = RequestScoreBadge.compute(impact, urgency, effort);
         Prioritization prioritization = existing != null ? existing : new Prioritization();
         prioritization.setRequest(request);
         prioritization.setImpact(impact);

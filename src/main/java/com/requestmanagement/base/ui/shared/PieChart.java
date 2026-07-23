@@ -1,4 +1,4 @@
-package com.requestmanagement.base.ui.po;
+package com.requestmanagement.base.ui.shared;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Div;
@@ -10,15 +10,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import java.util.List;
 
 /** Renders a set of labeled counts as a pure-CSS pie chart (no charting library needed). */
-final class PieChart {
+public final class PieChart {
 
     private PieChart() {
     }
 
-    record Slice(String label, long count, String color) {
+    public record Slice(String label, long count, String color) {
     }
 
-    static Component create(List<Slice> slices) {
+    public static Component create(List<Slice> slices) {
         long total = slices.stream().mapToLong(Slice::count).sum();
 
         Div pie = new Div();

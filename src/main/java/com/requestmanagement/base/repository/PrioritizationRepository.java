@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+/** Data access for {@link Prioritization} rows. */
 public interface PrioritizationRepository extends JpaRepository<Prioritization, Long> {
     Optional<Prioritization> findByRequest(Request request);
 }

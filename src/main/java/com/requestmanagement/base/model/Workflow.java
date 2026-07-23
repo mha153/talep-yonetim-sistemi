@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/** The development-side tracking of a prioritized {@link Request}: who claimed it and how far along it is. */
 @Entity
 @Table(name = "MUSTAFA_WORKFLOWS")
 public class Workflow {

@@ -17,19 +17,21 @@ public class RequestConversationView extends Dialog {
     public RequestConversationView(Request request, MessageChannel channel, String title,
                                     RequestMessageRepository messageRepository) {
         setHeaderTitle(title + " — Talep #" + request.getRequestId());
-        setWidth("420px");
+        setWidth("560px");
 
         VerticalLayout thread = new VerticalLayout();
         thread.setPadding(false);
+        thread.setWidthFull();
         List<RequestMessage> messages =
                 messageRepository.findByRequestAndChannelOrderByCreatedAtAsc(request, channel);
         if (messages.isEmpty()) {
             thread.add(new Span("Henüz mesaj yok."));
         } else {
-            messages.forEach(m -> thread.add(new Span(m.getAuthor().getNameSurname() + ": " + m.getBody())));
+            messages.forEach(m -> thread.add(MessageBubble.create(m, null)));
         }
 
         Scroller scroller = new Scroller(thread);
+        scroller.setWidthFull();
         scroller.setHeight("240px");
         add(scroller);
     }

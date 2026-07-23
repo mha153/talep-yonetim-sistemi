@@ -27,6 +27,7 @@ class AppUserDetailsService implements UserDetailsService {
         return User.withUsername(username)
                 .password(user.getPassword())
                 .roles(user.getRole().name())
+                .disabled(!user.isActive())
                 .build();
     }
 }

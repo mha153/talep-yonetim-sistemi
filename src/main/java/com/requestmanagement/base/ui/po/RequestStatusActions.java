@@ -20,12 +20,13 @@ final class RequestStatusActions {
 
     static void reject(Request request, RequestRepository requestRepository,
                         NotificationRepository notificationRepository,
-                        RequestActivityRepository activityRepository, AppUser currentPo) {
+                        RequestActivityRepository activityRepository, AppUser currentPo, String reason) {
         request.setStatus(RequestStatus.REJECTED);
         requestRepository.save(request);
-        ActivityRecorder.record(activityRepository, request, "Reddedildi");
+        String reasonSuffix = reason == null || reason.isBlank() ? "" : " (" + reason + ")";
+        ActivityRecorder.record(activityRepository, request, "Reddedildi" + reasonSuffix);
         NotificationCenter.notifyCustomer(notificationRepository, request, currentPo,
-                "talebinizi reddetti: " + request.getTitle());
+                "talebinizi reddetti" + reasonSuffix + ": " + request.getTitle());
     }
 
     static void convertToWorkflow(Request request, WorkflowRepository workflowRepository,

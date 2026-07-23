@@ -12,6 +12,7 @@ import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.ui.messaging.MessageIndicatorIcon;
 import com.requestmanagement.base.ui.messaging.RequestConversationDialog;
+import com.requestmanagement.base.ui.shared.DeleteConfirmationDialog;
 import com.requestmanagement.base.ui.shared.Toast;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -39,15 +40,16 @@ final class RequestHistoryRowActions {
         if (!RequestStatus.NEW.equals(request.getStatus())) {
             return new HorizontalLayout(MessageIndicatorIcon.wrap(messageButton, hasUnread));
         }
-        Button cancelButton = new Button("İptal Et", e -> {
-            notificationRepository.deleteAll(notificationRepository.findByRequest(request));
-            messageRepository.deleteAll(messageRepository.findByRequest(request));
-            attachmentRepository.deleteAll(attachmentRepository.findByRequestOrderByCreatedAtAsc(request));
-            activityRepository.deleteAll(activityRepository.findByRequestOrderByCreatedAtAsc(request));
-            requestRepository.delete(request);
-            onChanged.run();
-            Toast.show("Talep silindi.");
-        });
+        Button cancelButton = new Button("İptal Et", e -> new DeleteConfirmationDialog(
+                "Bu talebi silmek istediğinize emin misiniz?", () -> {
+                    notificationRepository.deleteAll(notificationRepository.findByRequest(request));
+                    messageRepository.deleteAll(messageRepository.findByRequest(request));
+                    attachmentRepository.deleteAll(attachmentRepository.findByRequestOrderByCreatedAtAsc(request));
+                    activityRepository.deleteAll(activityRepository.findByRequestOrderByCreatedAtAsc(request));
+                    requestRepository.delete(request);
+                    onChanged.run();
+                    Toast.show("Talep silindi.");
+                }).open());
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         return new HorizontalLayout(MessageIndicatorIcon.wrap(messageButton, hasUnread), cancelButton);
     }

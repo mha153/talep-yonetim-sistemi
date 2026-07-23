@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
+/** A file (e.g. a screenshot) uploaded against a {@link Request}, stored as raw bytes in the database. */
 @Entity
 @Table(name = "MUSTAFA_ATTACHMENTS")
 public class RequestAttachment {

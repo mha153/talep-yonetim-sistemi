@@ -19,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+/** Read-only table of finished requests: rejected ones, plus completed workflow items. */
 class ArchivedRequestsGrid extends Grid<Request> {
 
     private final transient RequestRepository requestRepository;

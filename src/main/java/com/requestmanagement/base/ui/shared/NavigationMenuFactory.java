@@ -4,12 +4,15 @@ import com.requestmanagement.base.repository.RequestRepository;
 import com.requestmanagement.base.repository.UserRepository;
 import com.requestmanagement.base.repository.WorkflowRepository;
 import com.requestmanagement.base.ui.archive.CompletedView;
+import com.requestmanagement.base.ui.customer.CustomerAnalyticsView;
 import com.requestmanagement.base.ui.customer.CustomerRequestView;
+import com.requestmanagement.base.ui.developer.DeveloperAnalyticsView;
 import com.requestmanagement.base.ui.developer.MyTasksView;
 import com.requestmanagement.base.ui.developer.SprintView;
 import com.requestmanagement.base.ui.po.DashboardView;
 import com.requestmanagement.base.ui.po.PendingRequestsView;
 import com.requestmanagement.base.ui.po.SprintTrackingView;
+import com.requestmanagement.base.ui.po.UserManagementView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
@@ -40,6 +43,7 @@ final class NavigationMenuFactory {
 
         if (isCustomer) {
             nav.addItem(new SideNavItem("Taleplerim", CustomerRequestView.class));
+            nav.addItem(new SideNavItem("Analiz", CustomerAnalyticsView.class));
         }
 
         if (isProductOwner) {
@@ -49,6 +53,7 @@ final class NavigationMenuFactory {
                     PendingRequestsView.class));
             nav.addItem(new SideNavItem("Sprint Takibi", SprintTrackingView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
+            nav.addItem(new SideNavItem("Kullanıcılar", UserManagementView.class));
         }
 
         if (isDeveloper) {
@@ -59,6 +64,7 @@ final class NavigationMenuFactory {
                     .orElse(0L);
             nav.addItem(new SideNavItem(NavigationBadges.withCount("Görevlerim", myTasksCount), MyTasksView.class));
             nav.addItem(new SideNavItem("Arşiv", CompletedView.class));
+            nav.addItem(new SideNavItem("Analiz", DeveloperAnalyticsView.class));
         }
 
         nav.addItem(new SideNavItem("Profil Ayarları", ProfileView.class));

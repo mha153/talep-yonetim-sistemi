@@ -27,7 +27,7 @@ class PriorityScoreDisplay extends VerticalLayout {
             priorityBadge.setText("");
             return;
         }
-        int score = RequestScoreBadge.compute(impact, urgency);
+        int score = RequestScoreBadge.compute(impact, urgency, RequestScoreBadge.DEFAULT_EFFORT);
         scoreLabel.setText(String.valueOf(score));
         scoreLabel.getStyle().set("color", RequestScoreBadge.color(score));
         priorityBadge.getElement().getThemeList().remove("error");

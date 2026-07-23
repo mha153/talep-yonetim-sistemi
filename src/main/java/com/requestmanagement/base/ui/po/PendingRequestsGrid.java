@@ -20,6 +20,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import java.util.Comparator;
 import java.util.List;
 
+/** Table of requests awaiting PO triage (new, under review, or prioritized but not yet in a workflow). */
 class PendingRequestsGrid extends Grid<Request> {
 
     private static final List<RequestStatus> LISTED_STATUSES =

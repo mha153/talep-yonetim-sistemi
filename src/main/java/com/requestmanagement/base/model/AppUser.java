@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/** A system user: customer, product owner, or developer, identified by their {@link Role}. */
 @Entity
 @Table(name = "MUSTAFA_USERS")
 public class AppUser {
@@ -30,8 +31,15 @@ public class AppUser {
     @Column(name = "role", nullable = false, length = 20)
     private Role role;
 
+    @Column(name = "active")
+    private Boolean active;
+
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
+
+    /** Treats existing rows with no value yet as active, so this stays backward-compatible. */
+    public boolean isActive() { return active == null || active; }
+    public void setActive(boolean active) { this.active = active; }
 
     public String getNameSurname() { return nameSurname; }
     public void setNameSurname(String nameSurname) { this.nameSurname = nameSurname; }

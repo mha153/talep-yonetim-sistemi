@@ -5,6 +5,7 @@ import com.requestmanagement.base.model.MessageChannel;
 import com.requestmanagement.base.model.Workflow;
 import com.requestmanagement.base.model.WorkflowStatus;
 import com.requestmanagement.base.repository.NotificationRepository;
+import com.requestmanagement.base.repository.PrioritizationRepository;
 import com.requestmanagement.base.repository.RequestActivityRepository;
 import com.requestmanagement.base.repository.RequestMessageRepository;
 import com.requestmanagement.base.repository.UserRepository;
@@ -24,7 +25,8 @@ final class MyTaskRowActions {
     }
 
     static HorizontalLayout build(Workflow workflow, WorkflowRepository workflowRepository,
-                                   UserRepository userRepository, NotificationRepository notificationRepository,
+                                   PrioritizationRepository prioritizationRepository, UserRepository userRepository,
+                                   NotificationRepository notificationRepository,
                                    RequestActivityRepository activityRepository,
                                    RequestMessageRepository messageRepository, AppUser currentDeveloper,
                                    Runnable onChanged) {
@@ -48,7 +50,11 @@ final class MyTaskRowActions {
                 onChanged.run();
             });
             completeButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-            actions.add(completeButton);
+            Button effortButton = new Button("Efor Belirle", e -> new EffortDialog(workflow,
+                    prioritizationRepository, notificationRepository, userRepository, activityRepository,
+                    onChanged).open());
+            effortButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+            actions.add(completeButton, effortButton);
         } else {
             Button testButton = new Button("Teste Al", e -> {
                 WorkflowActions.startTesting(workflow, currentDeveloper, workflowRepository, userRepository,

@@ -52,11 +52,8 @@ final class RequestActionButtons {
             });
         }
 
-        contextMenu.addItem("Reddet", e -> {
-            RequestStatusActions.reject(request, requestRepository, notificationRepository, activityRepository,
-                    currentPo);
-            onChange.run();
-        });
+        contextMenu.addItem("Reddet", e -> new RejectRequestDialog(request, requestRepository,
+                notificationRepository, activityRepository, currentPo, onChange).open());
 
         contextMenu.addItem("Müşteri ile Mesajlaş", e -> new RequestConversationDialog(request,
                 MessageChannel.CUSTOMER_PO, "Müşteri Görüşmesi", messageRepository, notificationRepository,

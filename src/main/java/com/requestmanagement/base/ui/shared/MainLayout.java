@@ -18,6 +18,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.ScrollerVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.PermitAll;
@@ -25,15 +27,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
+/** The shared app shell (logo, theme toggle, notification bell, side nav, logout) that wraps every logged-in page. */
 @Layout
 @PermitAll
-public final class MainLayout extends AppLayout {
+public final class MainLayout extends AppLayout implements AfterNavigationObserver {
 
     private final transient AuthenticationContext authContext;
     private final transient UserRepository userRepository;
     private final transient NotificationRepository notificationRepository;
     private final transient WorkflowRepository workflowRepository;
     private final transient RequestRepository requestRepository;
+    private final Scroller drawerScroller;
 
     public MainLayout(AuthenticationContext authContext, UserRepository userRepository,
                        NotificationRepository notificationRepository, WorkflowRepository workflowRepository,
@@ -44,7 +48,22 @@ public final class MainLayout extends AppLayout {
         this.workflowRepository = workflowRepository;
         this.requestRepository = requestRepository;
         setPrimarySection(Section.DRAWER);
-        addToDrawer(createApplicationHeader(), createApplicationDrawer(), createApplicationFooter());
+        drawerScroller = new Scroller();
+        drawerScroller.addThemeVariants(ScrollerVariant.OVERFLOW_INDICATORS);
+        refreshDrawerNav();
+        addToDrawer(createApplicationHeader(), drawerScroller, createApplicationFooter());
+    }
+
+    /** Rebuilds the side-nav badge counts, since Vaadin reuses this layout instance across navigations. */
+    @Override
+    public void afterNavigation(AfterNavigationEvent event) {
+        refreshDrawerNav();
+    }
+
+    private void refreshDrawerNav() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        drawerScroller.setContent(NavigationMenuFactory.buildSideNav(
+                auth, requestRepository, workflowRepository, userRepository));
     }
 
     private Component createApplicationHeader() {
@@ -63,16 +82,8 @@ public final class MainLayout extends AppLayout {
         return header;
     }
 
-    private Component createApplicationDrawer() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        var scroller = new Scroller(NavigationMenuFactory.buildSideNav(
-                auth, requestRepository, workflowRepository, userRepository));
-        scroller.addThemeVariants(ScrollerVariant.OVERFLOW_INDICATORS);
-        return scroller;
-    }
-
     private Component createApplicationFooter() {
-        Span currentUserLabel = new Span(currentUserDisplayText());
+        Span currentUserLabel = new Span(currentUser().map(this::formatUser).orElse(""));
         currentUserLabel.getStyle().set("white-space", "normal").set("text-align", "center");
 
         Button logoutButton = new Button("Çıkış Yap", e -> authContext.logout());
@@ -88,10 +99,6 @@ public final class MainLayout extends AppLayout {
     private Optional<AppUser> currentUser() {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         return auth == null ? Optional.empty() : CurrentUserResolver.find(userRepository, auth);
-    }
-
-    private String currentUserDisplayText() {
-        return currentUser().map(this::formatUser).orElse("");
     }
 
     private String formatUser(AppUser user) {

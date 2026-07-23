@@ -10,6 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.time.Instant;
+
+/** A customer-submitted request, from creation through triage to rejection or hand-off to a {@link Workflow}. */
 @Entity
 @Table(name = "MUSTAFA_REQUESTS")
 public class Request {
@@ -33,8 +36,14 @@ public class Request {
     @Column(name = "status", nullable = false, length = 30)
     private RequestStatus status = RequestStatus.NEW;
 
+    @Column(name = "created_at")
+    private Instant createdAt;
+
     public Long getRequestId() { return requestId; }
     public void setRequestId(Long requestId) { this.requestId = requestId; }
+
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
     public AppUser getCustomer() { return customer; }
     public void setCustomer(AppUser customer) { this.customer = customer; }

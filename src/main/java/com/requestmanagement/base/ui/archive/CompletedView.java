@@ -15,6 +15,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+/** The "Arşiv" page: search box plus the archived-requests table, shared by PO and developer roles. */
 @Route("archive")
 @RolesAllowed({"PRODUCT_OWNER", "DEVELOPER"})
 public class CompletedView extends VerticalLayout implements BeforeEnterObserver {

@@ -43,9 +43,10 @@ class MyTasksGrid extends Grid<Workflow> {
                 .setHeader("Skor").setWidth("150px").setFlexGrow(0);
         addColumn(workflow -> workflow.getWorkflowStatus().displayLabel())
                 .setHeader("Durum").setWidth("140px").setFlexGrow(0);
-        addComponentColumn(workflow -> MyTaskRowActions.build(workflow, workflowRepository, userRepository,
-                notificationRepository, activityRepository, messageRepository, currentDeveloper, this::refresh))
-                .setHeader("İşlem").setWidth("380px").setFlexGrow(0);
+        addComponentColumn(workflow -> MyTaskRowActions.build(workflow, workflowRepository, prioritizationRepository,
+                userRepository, notificationRepository, activityRepository, messageRepository, currentDeveloper,
+                this::refresh))
+                .setHeader("İşlem").setWidth("460px").setFlexGrow(0);
 
         setItemDetailsRenderer(new ComponentRenderer<>(
                 workflow -> new RequestDetailsPanel(workflow.getRequest(), activityRepository, attachmentRepository)));

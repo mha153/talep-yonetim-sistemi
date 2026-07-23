@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+/** Wires Vaadin's security helper to {@link LoginView} and provides the password-hashing bean. */
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {

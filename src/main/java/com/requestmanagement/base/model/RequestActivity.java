@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
+/** One timestamped history entry for a {@link Request} (created, prioritized, claimed, etc.). */
 @Entity
 @Table(name = "MUSTAFA_ACTIVITY_LOG")
 public class RequestActivity {

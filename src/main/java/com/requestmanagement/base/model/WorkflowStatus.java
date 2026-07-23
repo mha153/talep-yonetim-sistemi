@@ -1,5 +1,6 @@
 package com.requestmanagement.base.model;
 
+/** Where a {@link Workflow} item sits in the development pipeline. */
 public enum WorkflowStatus {
     BACKLOG,
     IN_PROGRESS,

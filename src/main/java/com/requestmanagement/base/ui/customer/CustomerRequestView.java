@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
+/** The "Taleplerim" page: the new-request form on top of the customer's own request history. */
 @Route(value = "create-request", layout = MainLayout.class)
 @RolesAllowed("CUSTOMER")
 public class CustomerRequestView extends VerticalLayout implements BeforeEnterObserver {

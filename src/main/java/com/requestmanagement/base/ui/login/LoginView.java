@@ -8,8 +8,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+/** The public login screen; Spring Security posts credentials to it and reports errors back via a query param. */
 @Route(value = "login", layout = BlankLayout.class)
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
@@ -25,7 +27,10 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         login.setI18n(buildTurkishI18n());
         login.setForgotPasswordButtonVisible(false);
 
-        add(new H1("Talep Yönetim Sistemi"), login);
+        RouterLink registerLink = new RouterLink("Hesabınız yok mu? Kayıt olun", RegisterView.class);
+        registerLink.getStyle().set("text-decoration", "none");
+
+        add(new H1("Talep Yönetim Sistemi"), login, registerLink);
     }
 
     @Override

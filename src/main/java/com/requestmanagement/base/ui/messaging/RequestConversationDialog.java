@@ -26,16 +26,26 @@ public class RequestConversationDialog extends Dialog {
                                       NotificationRepository notificationRepository, UserRepository userRepository,
                                       AppUser currentUser, Runnable onMessageSent) {
         setHeaderTitle(title + " — Talep #" + request.getRequestId());
-        setWidth("420px");
+        setWidth("560px");
 
         markIncomingAsRead(request, channel, currentUser, messageRepository);
         onMessageSent.run();
 
+        boolean customerInactive = MessageChannel.CUSTOMER_PO.equals(channel) && !request.getCustomer().isActive()
+                && !currentUser.getUserId().equals(request.getCustomer().getUserId());
+        if (customerInactive) {
+            Span warning = new Span("Bu müşteri hesabı pasif; mesajınıza yanıt alamayabilirsiniz.");
+            warning.getStyle().set("color", "#e65100").set("font-size", "0.85rem");
+            add(warning);
+        }
+
         VerticalLayout thread = new VerticalLayout();
         thread.setPadding(false);
-        loadMessages(thread, request, channel, messageRepository);
+        thread.setWidthFull();
+        loadMessages(thread, request, channel, messageRepository, currentUser);
 
         Scroller scroller = new Scroller(thread);
+        scroller.setWidthFull();
         scroller.setHeight("240px");
 
         TextField input = new TextField();
@@ -55,12 +65,19 @@ public class RequestConversationDialog extends Dialog {
             MessageNotifier.notifyOtherParty(request, channel, currentUser, notificationRepository, userRepository);
             input.clear();
             thread.removeAll();
-            loadMessages(thread, request, channel, messageRepository);
+            loadMessages(thread, request, channel, messageRepository, currentUser);
             onMessageSent.run();
         });
         sendButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        add(new VerticalLayout(scroller, new HorizontalLayout(input, sendButton)));
+        HorizontalLayout inputRow = new HorizontalLayout(input, sendButton);
+        inputRow.setWidthFull();
+        inputRow.setFlexGrow(1, input);
+
+        VerticalLayout content = new VerticalLayout(scroller, inputRow);
+        content.setWidthFull();
+        content.setPadding(false);
+        add(content);
     }
 
     private void markIncomingAsRead(Request request, MessageChannel channel, AppUser currentUser,
@@ -74,13 +91,13 @@ public class RequestConversationDialog extends Dialog {
     }
 
     private void loadMessages(VerticalLayout thread, Request request, MessageChannel channel,
-                               RequestMessageRepository messageRepository) {
+                               RequestMessageRepository messageRepository, AppUser currentUser) {
         List<RequestMessage> messages =
                 messageRepository.findByRequestAndChannelOrderByCreatedAtAsc(request, channel);
         if (messages.isEmpty()) {
             thread.add(new Span("Henüz mesaj yok."));
             return;
         }
-        messages.forEach(m -> thread.add(new Span(m.getAuthor().getNameSurname() + ": " + m.getBody())));
+        messages.forEach(m -> thread.add(MessageBubble.create(m, currentUser.getUserId())));
     }
 }

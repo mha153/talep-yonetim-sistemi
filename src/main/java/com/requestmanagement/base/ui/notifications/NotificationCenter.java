@@ -6,6 +6,7 @@ import com.requestmanagement.base.model.Request;
 import com.requestmanagement.base.model.Role;
 import com.requestmanagement.base.repository.NotificationRepository;
 import com.requestmanagement.base.repository.UserRepository;
+import org.jspecify.annotations.Nullable;
 
 /** Creates {@link AppNotification} rows for the customer, the PO, or all developers. */
 public final class NotificationCenter {
@@ -28,6 +29,21 @@ public final class NotificationCenter {
                                             UserRepository userRepository, Request request, AppUser actor,
                                             String message) {
         notifyByRole(notificationRepository, userRepository, Role.DEVELOPER, request, actor, message);
+    }
+
+    /** Account-related notification (e.g. an e-posta change request) with no {@link Request} context. */
+    public static void notifyProductOwnerAccountEvent(NotificationRepository notificationRepository,
+                                                        UserRepository userRepository, @Nullable AppUser actor,
+                                                        String message) {
+        userRepository.findAll().stream()
+                .filter(user -> Role.PRODUCT_OWNER.equals(user.getRole()))
+                .forEach(user -> notify(notificationRepository, user, null, actor, message));
+    }
+
+    /** Account-related notification sent to a specific user, with no {@link Request} context. */
+    public static void notifyUserAccountEvent(NotificationRepository notificationRepository, AppUser recipient,
+                                               AppUser actor, String message) {
+        notify(notificationRepository, recipient, null, actor, message);
     }
 
     private static void notifyByRole(NotificationRepository notificationRepository, UserRepository userRepository,

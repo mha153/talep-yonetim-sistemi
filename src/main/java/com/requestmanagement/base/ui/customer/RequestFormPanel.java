@@ -24,6 +24,7 @@ import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -72,6 +73,7 @@ class RequestFormPanel extends VerticalLayout {
             newRequest.setTitle(titleField.getValue());
             newRequest.setDescription(descriptionField.getValue());
             newRequest.setStatus(RequestStatus.NEW);
+            newRequest.setCreatedAt(Instant.now());
             newRequest = requestRepository.save(newRequest);
 
             if (uploadedData.get() != null) {

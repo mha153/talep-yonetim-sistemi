@@ -13,6 +13,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
+/** One chat message on a {@link Request}, scoped to a {@link MessageChannel} (customer chat or internal note). */
 @Entity
 @Table(name = "MUSTAFA_REQUEST_MESSAGES")
 public class RequestMessage {

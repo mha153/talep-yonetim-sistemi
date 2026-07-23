@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
+/** The PO's urgency/impact scoring for one {@link Request}; a 1:1 relationship. */
 @Entity
 @Table(name = "MUSTAFA_PRIORITIZATIONS")
 public class Prioritization {
@@ -30,6 +31,9 @@ public class Prioritization {
     @Column(name = "priority_score", nullable = false)
     private Integer priorityScore;
 
+    @Column(name = "effort")
+    private Integer effort;
+
     public Long getPriorityId() { return priorityId; }
     public void setPriorityId(Long priorityId) { this.priorityId = priorityId; }
 
@@ -44,4 +48,7 @@ public class Prioritization {
 
     public Integer getPriorityScore() { return priorityScore; }
     public void setPriorityScore(Integer priorityScore) { this.priorityScore = priorityScore; }
+
+    public Integer getEffort() { return effort; }
+    public void setEffort(Integer effort) { this.effort = effort; }
 }
